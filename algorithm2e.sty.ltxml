@@ -1,0 +1,62 @@
+# -*- CPERL -*-
+# /=======================================================\ #
+# |  ifthen.sty - Implementation for LaTeXML              | #
+# |                                                       | #
+# |=======================================================| #
+# | Part of LaTeXML : http://dlmf.nist.gov/LaTeXML/       | #
+# | Copyright (c) 2011 Josh Bialkowski                    | #
+# | Released under the GNU Public License                 | #
+# |=======================================================| #
+# | Author: Josh Bialkowski                               | #
+# | E-mail: jbiakl@mit.edu                                | #
+# \=======================================================/ #
+
+use strict;
+use LaTeXML::Package;
+
+
+
+RelaxNGSchema('algorithm2e');
+
+NewCounter('algo@algo', 'document',  idprefix=>'A');
+NewCounter('algo@line', 'algo@algo', idprefix=>'L', idwithin=>'algo@algo');
+
+
+DefConstructor('\algo@endline',sub{
+    my $document = shift;
+    my $whatsit  = shift;
+    my %ref      = RefStepCounter('algo@line');
+    $document->addAttribute("xml:id"=>$ref{'id'});
+    $document->closeElement("ltx:line");
+    $document->openElement("ltx:line");	
+});
+
+DefConstructor('\algorithm[]',sub{
+	my $document = shift;
+    my %ref      = RefStepCounter('algo@algo');
+    $document->openElement("ltx:algorithm");
+    $document->addAttribute("xml:id"=>$ref{'id'});
+    $document->openElement("ltx:line");
+},
+    beforeDigest=>sub{
+    	my $stomach = shift;
+    	Let('\algo@oldsemicolon','\;');
+    	Let('\;','\algo@endline');
+    }    
+);
+
+DefConstructor('\endalgorithm',sub{
+	my $document = shift;
+    my %ref      = RefStepCounter('algo@line');
+    $document->addAttribute("xml:id"=>$ref{'id'});
+    $document->closeElement("ltx:line");
+    $document->closeElement("ltx:algorithm");	
+},
+    beforeDigest=>sub{
+        my $stomach = shift;
+        Let('\;','\algo@oldsemicolon');
+    }
+);
+
+
+1;

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  /=====================================================================\ 
+  |  algorithm2e.rng                                                    |
+  | RelaxNG model for algorithm2e package                               |
+  |=====================================================================|
+  | Copyright: Josh Bialkowski                                          |
+  |=====================================================================|
+  | Author:  Josh Bialkowski                                            |
+  | Email:   jbialk@mit.edu                                             |  
+  \=====================================================================/
+-->
+<grammar ns="http://dlmf.nist.gov/LaTeXML" 
+        xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" 
+        xmlns="http://relaxng.org/ns/structure/1.0" 
+        datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+  <include href="/usr/share/perl5/LaTeXML/schema/RelaxNG/LaTeXML.rng"/>
+  <define name="Para.class" combine="choice">
+    <choice>
+      <ref name="Algorithm.algorithm"/>
+    </choice>
+  </define>
+  <define name="Algorithm.algorithm">
+    <element name="algorithm">
+      <a:documentation>A logical block composing an algorithm</a:documentation>
+      <ref name="Common.attributes"/>
+      <ref name="Algorithm.line"/>
+    </element>
+  </define>
+  <define name="Algorithm.line">
+    <element name="line">
+      <a:documentation>A logical block composing one line of an algorithm</a:documentation>
+      <ref name="Common.attributes"/>
+      <ref name="Inline.model"/>
+    </element>
+  </define>
+</grammar>
