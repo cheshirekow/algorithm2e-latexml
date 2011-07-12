@@ -7,6 +7,7 @@ div.algorithm2e-float
 div.algorithm2e-algorithm
 {
 	display: inline-block;
+	max-width:      80%;
 	text-align:     left;
     padding-left:   20px;
     padding-right:  30px;
@@ -15,6 +16,10 @@ div.algorithm2e-algorithm
     border-width:   1px;
 }
 
+div.algorithm2e-caption
+{
+	
+}
 
 div.algorithm2e-block{margin-left: 20px;}
 

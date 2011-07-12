@@ -31,8 +31,16 @@
 <xsl:template match="algorithm2e:algorithm" xml:space="preserve">
   <div class="algorithm2e-float">
 	  <div class="algorithm2e-algorithm">
-	    <xsl:apply-templates/>
+	    <xsl:apply-templates select="algorithm2e:block|algorithm2e:line"/>
 	  </div>
+	  <br/>
+	  <xsl:apply-templates select="algorithm2e:caption"/>
+  </div>
+</xsl:template>
+
+<xsl:template match="algorithm2e:caption" xml:space="preserve">
+  <div class="algorithm2e-caption">
+    <xsl:apply-templates/>
   </div>
 </xsl:template>
 

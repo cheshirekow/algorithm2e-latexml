@@ -27,7 +27,15 @@
       <a:documentation>A logical block composing an algorithm</a:documentation>
       <ref name="Common.attributes"/>
       <ref name="Labelled.attributes"/>
+      <ref name="Algorithm.caption"/>
       <ref name="Algorithm.block"/>
+    </element>
+  </define>
+  <define name="Algorithm.caption">
+    <element name="caption" ns="http://dlmf.nist.gov/LaTeXML/packages/algorithm2e" >
+      <ref name="Common.attributes"/>
+      <ref name="Labelled.attributes"/>
+      <ref name="Inline.model"/>
     </element>
   </define>
   <define name="Algorithm.block">

@@ -24,6 +24,7 @@ our $lineNumbered   = 1;
 
 our $currentLineNode;
 our $currentCaptionNode;
+our $restoreNode;
 
 # registers the "algorithm2e" xml prefix to point to the algorithm2e namespace
 RegisterNamespace('algorithm2e','http://dlmf.nist.gov/LaTeXML/packages/algorithm2e');
@@ -45,7 +46,7 @@ DefMacro('\eIf{}{}',    '\KwSty{if}: \emph{#1} \KwSty{then} \algoBeginBlock #2 \
 DefMacro('\KwData{}',   '\KwSty{Data}: \emph{#1} \algoEndLine');
 DefMacro('\KwResult{}', '\KwSty{Result}: \emph{#1} \algoEndLine');
 
-
+DefMacro('\algoCaption{}',  '\beginAlgoCaption {#1} \endAlgoCaption');
 
 
 
@@ -79,8 +80,10 @@ DefConstructor('\algorithm[]',sub{
 },
     beforeDigest=>sub{
     	my $stomach = shift;
-    	Let('\algoOldsemicolon','\;');
+    	Let('\algoOldSemicolon','\;');
+    	Let('\algoOldCaption','\caption');
     	Let('\;','\algoEndLine');
+    	Let('\caption','\algoCaption');
     }    
 );
 
@@ -93,8 +96,20 @@ DefConstructor('\endalgorithm',sub{
     beforeDigest=>sub{
         my $stomach = shift;
         Let('\;','\algoOldsemicolon');
+        Let('\caption','\algoOldCaption');
     }
 );
+
+DefConstructor('\beginAlgoCaption',sub{
+	my $document = shift;
+	$restoreNode = $document->getNode;
+	$document->setNode($currentCaptionNode);
+});
+
+DefConstructor('\endAlgoCaption',sub{
+	my $document = shift;
+	$document->setNode($restoreNode);
+});
 
 
 sub algoBeginEnv
@@ -104,6 +119,9 @@ sub algoBeginEnv
     $document->openElement("algorithm2e:algorithm");
     $document->addAttribute("refnum"=>$ref{'refnum'});
     $document->addAttribute("xml:id"=>$ref{'id'});
+    $document->openElement("algorithm2e:caption");
+    $currentCaptionNode = $document->getNode;
+    $document->closeElement("algorithm2e:caption");
     $algoDepth   = 0;
 }
 
