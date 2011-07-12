@@ -15,8 +15,10 @@ use strict;
 use LaTeXML::Package;
 
 
+RegisterNamespace('algorithm2e','http://dlmf.nist.gov/LaTeXML/packages/algorithm2e');
+RelaxNGSchema('algorithm2e','algorithm2e'=>'http://dlmf.nist.gov/LaTeXML/packages/algorithm2e');
 
-RelaxNGSchema('algorithm2e');
+
 
 NewCounter('algo@algo', 'document',  idprefix=>'A');
 NewCounter('algo@line', 'algo@algo', idprefix=>'L', idwithin=>'algo@algo');
@@ -28,17 +30,17 @@ DefConstructor('\algo@endline',sub{
     my %ref      = RefStepCounter('algo@line');
     $document->addAttribute("refnum"=>$ref{'refnum'});
     $document->addAttribute("xml:id"=>$ref{'id'});
-    $document->closeElement("ltx:line");
-    $document->openElement("ltx:line");	
+    $document->closeElement("algorithm2e:line");
+    $document->openElement("algorithm2e:line");	
 }); 
 
 DefConstructor('\algorithm[]',sub{
 	my $document = shift;
     my %ref      = RefStepCounter('algo@algo');
-    $document->openElement("ltx:algorithm");
+    $document->openElement("algorithm2e:algorithm");
     $document->addAttribute("refnum"=>$ref{'refnum'});
     $document->addAttribute("xml:id"=>$ref{'id'});
-    $document->openElement("ltx:line");
+    $document->openElement("algorithm2e:line");
 },
     beforeDigest=>sub{
     	my $stomach = shift;
@@ -52,8 +54,8 @@ DefConstructor('\endalgorithm',sub{
     my %ref      = RefStepCounter('algo@line');
     $document->addAttribute("refnum"=>$ref{'refnum'});
     $document->addAttribute("xml:id"=>$ref{'id'});
-    $document->closeElement("ltx:line");
-    $document->closeElement("ltx:algorithm");	
+    $document->closeElement("algorithm2e:line");
+    $document->closeElement("algorithm2e:algorithm");	
 },
     beforeDigest=>sub{
         my $stomach = shift;

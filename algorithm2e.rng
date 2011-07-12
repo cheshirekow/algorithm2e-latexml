@@ -20,8 +20,8 @@
       <ref name="Algorithm.algorithm"/>
     </choice>
   </define>
-  <define name="Algorithm.algorithm">
-    <element name="algorithm">
+  <define name="Algorithm.algorithm" >
+    <element name="algorithm" ns="http://dlmf.nist.gov/LaTeXML/packages/algorithm2e" >
       <a:documentation>A logical block composing an algorithm</a:documentation>
       <ref name="Common.attributes"/>
       <ref name="Labelled.attributes"/>
@@ -29,7 +29,7 @@
     </element>
   </define>
   <define name="Algorithm.line">
-    <element name="line">
+    <element name="line" ns="http://dlmf.nist.gov/LaTeXML/packages/algorithm2e">
       <a:documentation>A logical block composing one line of an algorithm</a:documentation>
       <ref name="Common.attributes"/>
       <ref name="Labelled.attributes"/>
