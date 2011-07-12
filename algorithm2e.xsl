@@ -29,8 +29,10 @@
 </func:function>
 
 <xsl:template match="algorithm2e:algorithm" xml:space="preserve">
-  <div class="algorithm2e-algorithm">
-    <xsl:apply-templates/>
+  <div class="algorithm2e-float">
+	  <div class="algorithm2e-algorithm">
+	    <xsl:apply-templates/>
+	  </div>
   </div>
 </xsl:template>
 

@@ -18,6 +18,12 @@ use strict;
 use LaTeXML::Package;
 
 our $algoDepth = 1;
+our $globalNumbered = 1;
+our $localNumbered  = 1;
+our $lineNumbered   = 1;
+
+our $currentLineNode;
+our $currentCaptionNode;
 
 # registers the "algorithm2e" xml prefix to point to the algorithm2e namespace
 RegisterNamespace('algorithm2e','http://dlmf.nist.gov/LaTeXML/packages/algorithm2e');
@@ -69,6 +75,7 @@ DefConstructor('\algorithm[]',sub{
 	algoBeginEnv($document);
 	algoBeginBlock($document);
 	algoBeginLine($document);
+	
 },
     beforeDigest=>sub{
     	my $stomach = shift;
@@ -124,15 +131,15 @@ sub algoEndBlock
 sub algoBeginLine
 {
     my $document = shift;
-    my %ref      = RefStepCounter('algoLine');
-    $document->openElement("algorithm2e:line");
-    $document->addAttribute("refnum"=>$ref{'refnum'});
-    $document->addAttribute("xml:id"=>$ref{'id'});
+    $currentLineNode = $document->openElement("algorithm2e:line");
 }
 
 sub algoEndLine
 {
 	my $document = shift;
+    my %ref = RefStepCounter('algoLine');
+    $currentLineNode->setAttribute("refnum",$ref{'refnum'});
+    $currentLineNode->setAttribute("xml:id",$ref{'id'});
     $document->closeElement("algorithm2e:line");
 }
 
@@ -142,7 +149,6 @@ sub algoCancelLine
     my $node = $document->getElement("algorithm2e:line");
     $document->closeElement("algorithm2e:line");
     $node->parentNode->removeChild($node);
-    AddToCounter('algoLine',Number(-1));
 }
 
 
