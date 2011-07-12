@@ -63,7 +63,7 @@
 
 
 
-<xsl:template match="algorithm2e:algorithm/algorithm2e:block/algorithm2e:line" xml:space="preserve">
+<xsl:template match="algorithm2e:block/algorithm2e:line" xml:space="preserve">
   <div class="algorithm2e-line algorithm2e-{f:alternate(.)}">
     <div class="algorithm2e-lineno"><xsl:value-of select="./@refnum"/></div> 
     <xsl:call-template name="spacer.loop" xml:space="default">

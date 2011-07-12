@@ -24,7 +24,8 @@ div.algorithm2e-block-10{margin-left: 90px;}
 
 div.algorithm2e-line
 {
-    border-style: none;
+    border-style:   none;
+    position:       relative;
 }
 
 div.algorithm2e-line-a
@@ -39,8 +40,7 @@ div.algorithm2e-line-b
 
 div.algorithm2e-lineno
 {
-    display:   inline-block;
-    position:  relative;
+    position:  absolute;
     left:      -30px;
     font-size: smaller;
 }
@@ -53,5 +53,5 @@ div.algorithm2e-spacer
     height:         8px;
     border-style:   solid;
     border-width:   1px;
-    border-color:   #8f8;
+    border-color:   #0a0;
 }

@@ -27,6 +27,9 @@ RelaxNGSchema('algorithm2e','algorithm2e'=>'http://dlmf.nist.gov/LaTeXML/package
 NewCounter('algoAlgo', 'document',  idprefix=>'A');
 NewCounter('algoLine', 'algoAlgo',  idprefix=>'L', idwithin=>'algoAlgo');
 
+DefMacro('\KwSty{}','{\tt \bf #1}');
+DefMacro('\While{}{}','\KwSty{While}: #1 \KwSty{do} \algoBeginBlock #2 \algoEndBlock \KwSty{Done} \;');
+
 DefConstructor('\algoEndline',sub{
     my $document = shift;
     my %ref      = RefStepCounter('algoLine');
@@ -35,6 +38,29 @@ DefConstructor('\algoEndline',sub{
     $document->closeElement("algorithm2e:line");
     $document->openElement("algorithm2e:line");	
 }); 
+
+DefConstructor('\algoBeginBlock',sub{
+    my $document = shift;
+    my %ref      = RefStepCounter('algoLine');
+    $document->addAttribute("refnum"=>$ref{'refnum'});
+    $document->addAttribute("xml:id"=>$ref{'id'});
+    $document->closeElement("algorithm2e:line");
+
+    $algoDepth = $algoDepth + 1;
+    $document->openElement("algorithm2e:block");
+    $document->addAttribute("depth"=>$algoDepth);
+    $document->openElement("algorithm2e:line");
+});
+
+DefConstructor('\algoEndBlock',sub{
+	my $document = shift;
+    my %ref      = RefStepCounter('algoLine');
+    $document->addAttribute("refnum"=>$ref{'refnum'});
+    $document->addAttribute("xml:id"=>$ref{'id'});
+    $document->closeElement("algorithm2e:line");
+    $document->closeElement("algorithm2e:block");
+    $document->openElement("algorithm2e:line");
+});
 
 DefConstructor('\algorithm[]',sub{
 	my $document = shift;
