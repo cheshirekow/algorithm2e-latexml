@@ -24,14 +24,12 @@ RegisterNamespace('algorithm2e','http://dlmf.nist.gov/LaTeXML/packages/algorithm
 RelaxNGSchema('algorithm2e','algorithm2e'=>'http://dlmf.nist.gov/LaTeXML/packages/algorithm2e');
 
 
-NewCounter('algo@algo', 'document',  idprefix=>'A');
-NewCounter('algo@line', 'algo@algo', idprefix=>'L', idwithin=>'algo@algo');
+NewCounter('algoAlgo', 'document',  idprefix=>'A');
+NewCounter('algoLine', 'algoAlgo',  idprefix=>'L', idwithin=>'algoAlgo');
 
-
-DefConstructor('\algo@endline',sub{
+DefConstructor('\algoEndline',sub{
     my $document = shift;
-    my $whatsit  = shift;
-    my %ref      = RefStepCounter('algo@line');
+    my %ref      = RefStepCounter('algoLine');
     $document->addAttribute("refnum"=>$ref{'refnum'});
     $document->addAttribute("xml:id"=>$ref{'id'});
     $document->closeElement("algorithm2e:line");
@@ -40,7 +38,7 @@ DefConstructor('\algo@endline',sub{
 
 DefConstructor('\algorithm[]',sub{
 	my $document = shift;
-    my %ref      = RefStepCounter('algo@algo');
+    my %ref      = RefStepCounter('algoAlgo');
     $document->openElement("algorithm2e:algorithm");
     $document->addAttribute("refnum"=>$ref{'refnum'});
     $document->addAttribute("xml:id"=>$ref{'id'});
@@ -49,14 +47,14 @@ DefConstructor('\algorithm[]',sub{
 },
     beforeDigest=>sub{
     	my $stomach = shift;
-    	Let('\algo@oldsemicolon','\;');
-    	Let('\;','\algo@endline');
+    	Let('\algoOldsemicolon','\;');
+    	Let('\;','\algoEndline');
     }    
 );
 
 DefConstructor('\endalgorithm',sub{
 	my $document = shift;
-    my %ref      = RefStepCounter('algo@line');
+    my %ref      = RefStepCounter('algoLine');
     $document->addAttribute("refnum"=>$ref{'refnum'});
     $document->addAttribute("xml:id"=>$ref{'id'});
     $document->closeElement("algorithm2e:line");
@@ -65,7 +63,7 @@ DefConstructor('\endalgorithm',sub{
 },
     beforeDigest=>sub{
         my $stomach = shift;
-        Let('\;','\algo@oldsemicolon');
+        Let('\;','\algoOldsemicolon');
     }
 );
 
