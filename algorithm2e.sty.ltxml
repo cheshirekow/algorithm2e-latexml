@@ -156,8 +156,8 @@ sub algoEndLine
 {
 	my $document = shift;
     my %ref = RefStepCounter('algoLine');
-    $currentLineNode->setAttribute("refnum",$ref{'refnum'});
-    $currentLineNode->setAttribute("xml:id",$ref{'id'});
+    $currentLineNode->setAttribute("refnum",ToString($ref{'refnum'}));
+    $currentLineNode->setAttribute("xml:id",ToString($ref{'id'}));
     $document->closeElement("algorithm2e:line");
 }
 
