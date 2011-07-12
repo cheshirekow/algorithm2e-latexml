@@ -44,9 +44,6 @@ DefMacro('\KwResult{}', '\KwSty{Result}: \emph{#1} \algoEndLine');
 
 
 
-
-
-
 DefConstructor('\algoEndLine',sub{
     my $document = shift;
     algoEndLine($document);

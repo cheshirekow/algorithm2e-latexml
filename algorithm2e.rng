@@ -15,7 +15,8 @@
         xmlns="http://relaxng.org/ns/structure/1.0" 
         datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
   <!--include href="/home/josh/Codes/devroot/usr/share/perl/5.10.1/LaTeXML/schema/RelaxNG/LaTeXML.rng"/  -->
-  <include href="/usr/share/perl5/LaTeXML/schema/RelaxNG/LaTeXML.rng"/>
+  <!--include href="/usr/share/perl5/LaTeXML/schema/RelaxNG/LaTeXML.rng"/-->
+  <include href="/home/josh/Codes/devroot/usr/share/perl/5.10.1/LaTeXML/schema/RelaxNG/LaTeXML.rng"/>
   <define name="Para.class" combine="choice">
     <choice>
       <ref name="Algorithm.algorithm"/>
