@@ -18,9 +18,11 @@ use strict;
 use LaTeXML::Package;
 
 our $algoDepth = 1;
-our $globalNumbered = 1;
-our $localNumbered  = 1;
-our $lineNumbered   = 1;
+
+our $globalNumbered = 1;        #all algos numbered by default
+our $localNumbered;             #this algo numbered
+our $singleLineNumberOn;        #this line numbered 
+our $singleLineNumberOff;       #this line not numbered
 
 our $currentLineNode;
 our $currentCaptionNode;
@@ -43,8 +45,8 @@ NewCounter('algoLine', 'algoAlgo',  idprefix=>'L', idwithin=>'algoAlgo');
 DefMacro('\KwSty{}',    '\textbf{#1}');
 DefMacro('\While{}{}',  '\KwSty{while}: #1 \KwSty{do} \algoBeginBlock #2 \algoEndBlock \KwSty{end} \;');
 DefMacro('\eIf{}{}',    '\KwSty{if}: \emph{#1} \KwSty{then} \algoBeginBlock #2 \algoEndBlock \KwSty{end} \;');
-DefMacro('\KwData{}',   '\KwSty{Data}: \emph{#1} \algoEndLine');
-DefMacro('\KwResult{}', '\KwSty{Result}: \emph{#1} \algoEndLine');
+DefMacro('\KwData{}',   '\algoSingleLineNumberOff \KwSty{Data}: \emph{#1} \algoEndLine');
+DefMacro('\KwResult{}', '\algoSingleLineNumberOff \KwSty{Result}: \emph{#1} \algoEndLine');
 
 DefMacro('\algoCaption{}',  '\beginAlgoCaption {#1} \endAlgoCaption');
 
@@ -111,6 +113,8 @@ DefConstructor('\endAlgoCaption',sub{
 	$document->setNode($restoreNode);
 });
 
+DefConstructor('\algoSingleLineNumberOff',sub{$singleLineNumberOff=1;});
+DefConstructor('\algoSingleLineNumberOn', sub{$singleLineNumberOn =1;});
 
 sub algoBeginEnv
 {
@@ -123,6 +127,10 @@ sub algoBeginEnv
     $currentCaptionNode = $document->getNode;
     $document->closeElement("algorithm2e:caption");
     $algoDepth   = 0;
+    
+    $localNumbered = $globalNumbered;
+    $singleLineNumberOff = 0;
+    $singleLineNumberOn  = 0;
 }
 
 sub algoEndEnv
@@ -155,10 +163,19 @@ sub algoBeginLine
 sub algoEndLine
 {
 	my $document = shift;
-    my %ref = RefStepCounter('algoLine');
-    $currentLineNode->setAttribute("refnum",ToString($ref{'refnum'}));
-    $currentLineNode->setAttribute("xml:id",ToString($ref{'id'}));
+    if($singleLineNumberOn || ($localNumbered && !$singleLineNumberOff) )
+    {
+    	my %ref = RefStepCounter('algoLine');
+	    $currentLineNode->setAttribute("refnum",ToString($ref{'refnum'}));
+	    $currentLineNode->setAttribute("xml:id",ToString($ref{'id'}));
+    }
+    else
+    {
+    	
+    }
     $document->closeElement("algorithm2e:line");
+    $singleLineNumberOff = 0;
+    $singleLineNumberOn  = 0;
 }
 
 sub algoCancelLine
