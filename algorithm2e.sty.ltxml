@@ -142,6 +142,7 @@ sub algoCancelLine
     my $node = $document->getElement("algorithm2e:line");
     $document->closeElement("algorithm2e:line");
     $node->parentNode->removeChild($node);
+    AddToCounter('algoLine',Number(-1));
 }
 
 
