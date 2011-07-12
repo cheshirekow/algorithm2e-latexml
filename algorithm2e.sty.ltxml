@@ -39,47 +39,39 @@ DefMacro('\eIf{}{}',    '\KwSty{if}: #1 \KwSty{then} \algoBeginBlock #2 \algoEnd
 DefMacro('\KwData{}',   '\KwSty{Data}: #1 \algoEndLine');
 DefMacro('\KwResult{}', '\KwSty{Result}: #1 \algoEndLine');
 
+
+
+
+
+
+
+
+
 DefConstructor('\algoEndLine',sub{
     my $document = shift;
-    my %ref      = RefStepCounter('algoLine');
-    $document->addAttribute("refnum"=>$ref{'refnum'});
-    $document->addAttribute("xml:id"=>$ref{'id'});
-    $document->closeElement("algorithm2e:line");
-    $document->openElement("algorithm2e:line");	
+    algoEndLine($document);
+    algoBeginLine($document);
 }); 
 
 DefConstructor('\algoBeginBlock',sub{
     my $document = shift;
-    my %ref      = RefStepCounter('algoLine');
-    $document->addAttribute("refnum"=>$ref{'refnum'});
-    $document->addAttribute("xml:id"=>$ref{'id'});
-    $document->closeElement("algorithm2e:line");
-
-    $algoDepth = $algoDepth + 1;
-    $document->openElement("algorithm2e:block");
-    $document->addAttribute("depth"=>$algoDepth);
-    $document->openElement("algorithm2e:line");
+    algoEndLine($document);
+    algoBeginBlock($document);
+    algoBeginLine($document);
 });
 
 DefConstructor('\algoEndBlock',sub{
 	my $document = shift;
-    my %ref      = RefStepCounter('algoLine');
-    $document->addAttribute("refnum"=>$ref{'refnum'});
-    $document->addAttribute("xml:id"=>$ref{'id'});
-    $document->closeElement("algorithm2e:line");
-    $document->closeElement("algorithm2e:block");
-    $document->openElement("algorithm2e:line");
+	algoEndLine($document);
+	algoEndBlock($document);
+	algoBeginLine($document);
 });
 
 DefConstructor('\algorithm[]',sub{
 	my $document = shift;
-    my %ref      = RefStepCounter('algoAlgo');
-    $document->openElement("algorithm2e:algorithm");
-    $document->addAttribute("refnum"=>$ref{'refnum'});
-    $document->addAttribute("xml:id"=>$ref{'id'});
-    $document->openElement("algorithm2e:block");
-    $document->addAttribute("depth"=>$algoDepth);
-    $document->openElement("algorithm2e:line");
+	algoBeginEnv($document);
+	algoBeginBlock($document);
+	algoBeginLine($document);
 },
     beforeDigest=>sub{
     	my $stomach = shift;
@@ -90,18 +82,66 @@ DefConstructor('\algorithm[]',sub{
 
 DefConstructor('\endalgorithm',sub{
 	my $document = shift;
-    my %ref      = RefStepCounter('algoLine');
-    $document->addAttribute("refnum"=>$ref{'refnum'});
-    $document->addAttribute("xml:id"=>$ref{'id'});
-    $document->closeElement("algorithm2e:line");
-    $document->closeElement("algorithm2e:block");
-    $document->closeElement("algorithm2e:algorithm");	
+	algoEndLine($document);
+	algoEndBlock($document);
+	algoEndEnv($document);
 },
     beforeDigest=>sub{
         my $stomach = shift;
         Let('\;','\algoOldsemicolon');
     }
 );
+
+
+sub algoBeginEnv
+{
+    my $document = shift;
+    my %ref      = RefStepCounter('algoAlgo');
+    $document->openElement("algorithm2e:algorithm");
+    $document->addAttribute("refnum"=>$ref{'refnum'});
+    $document->addAttribute("xml:id"=>$ref{'id'});
+    $algoDepth   = 0;
+}
+
+sub algoEndEnv
+{
+	my $document = shift;
+    $document->closeElement("algorithm2e:algorithm");
+}
+
+sub algoBeginBlock
+{
+	my $document = shift;
+    $algoDepth = $algoDepth + 1;
+    $document->openElement("algorithm2e:block");
+    $document->addAttribute("depth"=>$algoDepth);
+}
+
+sub algoEndBlock
+{
+	my $document = shift;
+	$document->closeElement("algorithm2e:block");
+	$algoDepth = $algoDepth - 1;
+}
+
+sub algoBeginLine
+{
+    my $document = shift;
+    my %ref      = RefStepCounter('algoLine');
+    $document->openElement("algorithm2e:line");
+    $document->addAttribute("refnum"=>$ref{'refnum'});
+    $document->addAttribute("xml:id"=>$ref{'id'});
+}
+
+sub algoEndLine
+{
+	my $document = shift;
+    $document->closeElement("algorithm2e:line");
+}
+
+
+
+
 
 
 1;

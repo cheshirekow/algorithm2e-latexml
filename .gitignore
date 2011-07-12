@@ -6,5 +6,7 @@
 .project
 .texlipse
 core.css
-test.png
+*.png
 test.svg
+*.cache
+
