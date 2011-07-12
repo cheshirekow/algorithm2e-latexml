@@ -62,7 +62,7 @@ DefConstructor('\algoBeginBlock',sub{
 
 DefConstructor('\algoEndBlock',sub{
 	my $document = shift;
-	algoEndLine($document);
+	algoCancelLine($document);
 	algoEndBlock($document);
 	algoBeginLine($document);
 });
@@ -139,7 +139,13 @@ sub algoEndLine
     $document->closeElement("algorithm2e:line");
 }
 
-
+sub algoCancelLine
+{
+    my $document = shift;
+    my $node = $document->getElement("algorithm2e:line");
+    $document->closeElement("algorithm2e:line");
+    $node->parentNode->removeChild($node);
+}
 
 
 
