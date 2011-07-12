@@ -1,3 +1,4 @@
+#!/usr/bin/perl
 # -*- CPERL -*-
 # /=======================================================\ #
 # |  ifthen.sty - Implementation for LaTeXML              | #
@@ -11,13 +12,16 @@
 # | E-mail: jbiakl@mit.edu                                | #
 # \=======================================================/ #
 
+package LaTeXML::Package;
+
 use strict;
 use LaTeXML::Package;
+
+our $algoDepth = 1;
 
 
 RegisterNamespace('algorithm2e','http://dlmf.nist.gov/LaTeXML/packages/algorithm2e');
 RelaxNGSchema('algorithm2e','algorithm2e'=>'http://dlmf.nist.gov/LaTeXML/packages/algorithm2e');
-
 
 
 NewCounter('algo@algo', 'document',  idprefix=>'A');
@@ -40,6 +44,7 @@ DefConstructor('\algorithm[]',sub{
     $document->openElement("algorithm2e:algorithm");
     $document->addAttribute("refnum"=>$ref{'refnum'});
     $document->addAttribute("xml:id"=>$ref{'id'});
+    $document->openElement("algorithm2e:block");
     $document->openElement("algorithm2e:line");
 },
     beforeDigest=>sub{
@@ -55,6 +60,7 @@ DefConstructor('\endalgorithm',sub{
     $document->addAttribute("refnum"=>$ref{'refnum'});
     $document->addAttribute("xml:id"=>$ref{'id'});
     $document->closeElement("algorithm2e:line");
+    $document->closeElement("algorithm2e:block");
     $document->closeElement("algorithm2e:algorithm");	
 },
     beforeDigest=>sub{

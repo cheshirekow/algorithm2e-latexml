@@ -15,24 +15,29 @@
   <xsl:param name="node"/>
     <xsl:choose>
       <xsl:when test="@refnum mod 2 = 0">
-        <func:result>a</func:result>
+        <func:result>line-a</func:result>
       </xsl:when>
       <xsl:otherwise>
-        <func:result>b</func:result>
+        <func:result>line-b</func:result>
       </xsl:otherwise>
     </xsl:choose>
 </func:function>
 
-<xsl:template match="algorithm2e:algorithm" xml:space="preserve">
-  <div class="{f:classes(.)}">
+<xsl:template match="algorithm2e:algorithm">
+  <div class="algorithm2e {f:classes(.)}">
     <xsl:apply-templates/>
   </div>
 </xsl:template>
 
-<xsl:template match="algorithm2e:algorithm/algorithm2e:line" xml:space="preserve">
-  <div class="{f:classes(.)} {f:alternate(.)}">
+<xsl:template match="algorithm2e:algorithm/algorithm2e:block">
+  <div class="algorithm2e {f:classes(.)}">
+    <xsl:apply-templates/>
+  </div>
+</xsl:template>
 
-    <span class="algorithm2e"> <xsl:value-of select="./@refnum"/> </span> <xsl:apply-templates/>
+<xsl:template match="algorithm2e:algorithm/algorithm2e:block/algorithm2e:line" xml:space="preserve">
+  <div class="algorithm2e {f:classes(.)} {f:alternate(.)}">
+    <span class="algorithm2e lineno"><xsl:attribute name="style">left: -<xsl:value-of select="30 * ../@depth"/>px</xsl:attribute><xsl:value-of select="./@refnum"/></span> <xsl:apply-templates/>
   </div>
   <div style="clear: both;"></div>
 </xsl:template>
