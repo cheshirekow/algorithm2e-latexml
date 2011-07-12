@@ -27,10 +27,13 @@ RelaxNGSchema('algorithm2e','algorithm2e'=>'http://dlmf.nist.gov/LaTeXML/package
 NewCounter('algoAlgo', 'document',  idprefix=>'A');
 NewCounter('algoLine', 'algoAlgo',  idprefix=>'L', idwithin=>'algoAlgo');
 
-DefMacro('\KwSty{}','{\tt \bf #1}');
-DefMacro('\While{}{}','\KwSty{While}: #1 \KwSty{do} \algoBeginBlock #2 \algoEndBlock \KwSty{Done} \;');
+DefMacro('\KwSty{}','\texttt{ \textbf{#1}}');
+DefMacro('\While{}{}','\KwSty{while}: #1 \KwSty{do} \algoBeginBlock #2 \algoEndBlock \KwSty{end} \;');
+DefMacro('\eIf{}{}','\KwSty{if}: #1 \KwSty{then} \algoBeginBlock #2 \algoEndBlock \KwSty{end} \;');
+DefMacro('\KwData{}','\KwSty{Data}: #1 \algoEndLine');
+DefMacro('\KwResult{}','\KwSty{Result}: #1 \algoEndLine');
 
-DefConstructor('\algoEndline',sub{
+DefConstructor('\algoEndLine',sub{
     my $document = shift;
     my %ref      = RefStepCounter('algoLine');
     $document->addAttribute("refnum"=>$ref{'refnum'});
@@ -75,7 +78,7 @@ DefConstructor('\algorithm[]',sub{
     beforeDigest=>sub{
     	my $stomach = shift;
     	Let('\algoOldsemicolon','\;');
-    	Let('\;','\algoEndline');
+    	Let('\;','\algoEndLine');
     }    
 );
 

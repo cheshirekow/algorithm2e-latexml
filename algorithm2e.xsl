@@ -13,18 +13,19 @@
 
 <func:function name="f:alternate">
   <xsl:param name="node"/>
-    <xsl:choose>
-      <xsl:when test="@refnum mod 2 = 0">
-        <func:result>line-a</func:result>
-      </xsl:when>
-      <xsl:otherwise>
-        <func:result>line-b</func:result>
-      </xsl:otherwise>
-    </xsl:choose>
+  <xsl:choose>
+    <xsl:when test="@refnum mod 2 = 0">
+      <func:result>line-a</func:result>
+    </xsl:when>
+    <xsl:otherwise>
+      <func:result>line-b</func:result>
+    </xsl:otherwise>
+  </xsl:choose>
 </func:function>
 
 <func:function name="f:depth">
-    <func:result> <xsl:value-of select="./@depth"/> </func:result>
+  <xsl:param name="node"/>
+  <func:result> <xsl:value-of select="$node/@depth"/> </func:result>
 </func:function>
 
 <xsl:template match="algorithm2e:algorithm" xml:space="preserve">
@@ -33,8 +34,8 @@
   </div>
 </xsl:template>
 
-<xsl:template match="algorithm2e:algorithm/algorithm2e:block" xml:space="preserve">
-  <div class="algorithm2e-block-{f:depth}">
+<xsl:template match="algorithm2e:block" xml:space="preserve">
+  <div class="algorithm2e-block-{f:depth(.)}">
     <xsl:apply-templates/>
   </div>
 </xsl:template>
@@ -45,7 +46,10 @@
 
     <!--begin_: Line_by_Line_Output -->
     <xsl:if test="$i &lt;= $count">
-    <div class="algorithm2e-spacer"></div>
+    <div class="algorithm2e-spacer algorithm2e-spacer-$i">
+      <div class="algorithm2e-spacer-inner">
+      </div>
+    </div>
     </xsl:if>
 
     <!--begin_: RepeatTheLoopUntilFinished-->
@@ -69,8 +73,10 @@
     <xsl:call-template name="spacer.loop" xml:space="default">
       <xsl:with-param name="i">1</xsl:with-param>
       <xsl:with-param name="count"><xsl:value-of select="../@depth - 1"/></xsl:with-param>
-    </xsl:call-template>     
-    <xsl:apply-templates/>
+    </xsl:call-template>
+    <div class="algorithm2e-linecontent algorithm2e-line-{f:depth(..)}">     
+      <xsl:apply-templates/>
+    </div>
   </div>
   <div style="clear: both;"></div>
 </xsl:template>
