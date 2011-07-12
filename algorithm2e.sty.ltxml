@@ -26,15 +26,17 @@ DefConstructor('\algo@endline',sub{
     my $document = shift;
     my $whatsit  = shift;
     my %ref      = RefStepCounter('algo@line');
+    $document->addAttribute("refnum"=>$ref{'refnum'});
     $document->addAttribute("xml:id"=>$ref{'id'});
     $document->closeElement("ltx:line");
     $document->openElement("ltx:line");	
-});
+}); 
 
 DefConstructor('\algorithm[]',sub{
 	my $document = shift;
     my %ref      = RefStepCounter('algo@algo');
     $document->openElement("ltx:algorithm");
+    $document->addAttribute("refnum"=>$ref{'refnum'});
     $document->addAttribute("xml:id"=>$ref{'id'});
     $document->openElement("ltx:line");
 },
@@ -48,6 +50,7 @@ DefConstructor('\algorithm[]',sub{
 DefConstructor('\endalgorithm',sub{
 	my $document = shift;
     my %ref      = RefStepCounter('algo@line');
+    $document->addAttribute("refnum"=>$ref{'refnum'});
     $document->addAttribute("xml:id"=>$ref{'id'});
     $document->closeElement("ltx:line");
     $document->closeElement("ltx:algorithm");	

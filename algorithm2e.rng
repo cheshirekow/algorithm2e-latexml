@@ -24,6 +24,7 @@
     <element name="algorithm">
       <a:documentation>A logical block composing an algorithm</a:documentation>
       <ref name="Common.attributes"/>
+      <ref name="Labelled.attributes"/>
       <ref name="Algorithm.line"/>
     </element>
   </define>
@@ -31,6 +32,7 @@
     <element name="line">
       <a:documentation>A logical block composing one line of an algorithm</a:documentation>
       <ref name="Common.attributes"/>
+      <ref name="Labelled.attributes"/>
       <ref name="Inline.model"/>
     </element>
   </define>
