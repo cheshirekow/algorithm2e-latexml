@@ -52,5 +52,6 @@ div.algorithm2e-spacer
     width:          8px;
     height:         8px;
     border-style:   solid;
+    border-width:   1px;
     border-color:   #8f8;
 }
