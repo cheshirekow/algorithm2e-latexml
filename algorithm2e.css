@@ -9,8 +9,8 @@ div.algorithm2e-algorithm
 	display: inline-block;
 	max-width:      80%;
 	text-align:     left;
-    padding-left:   20px;
-    padding-right:  30px;
+    padding-left:   8px;
+    padding-right:  50px;
     border-style:   solid;
     border-color:   black;
     border-width:   1px;
@@ -47,9 +47,9 @@ div.algorithm2e-spacer-8 {left: -155px;}
 div.algorithm2e-spacer-9 {left: -175px;}
 div.algorithm2e-spacer-10{left: -195px;}
 
-div.algorithm2e-lineno-1 {left: -40px;}
-div.algorithm2e-lineno-2 {left: -60px;}
-div.algorithm2e-lineno-3 {left: -80px;}
+div.algorithm2e-lineno-1 {left: -20px;}
+div.algorithm2e-lineno-2 {left: -40px;}
+div.algorithm2e-lineno-3 {left: -60px;}
 div.algorithm2e-lineno-4 {left: -100px;}
 div.algorithm2e-lineno-5 {left: -120px;}
 div.algorithm2e-lineno-6 {left: -140px;}
@@ -89,7 +89,10 @@ div.algorithm2e-line-b
 div.algorithm2e-lineno
 {
     position:           absolute;
+    top:                2px;
     font-size:          smaller;
+    text-align:         right;
+    width:              12px;
     /*background-color:   #aaf;*/
 }
 
