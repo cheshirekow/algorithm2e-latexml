@@ -19,19 +19,25 @@ use LaTeXML::Package;
 
 our $algoDepth = 1;
 
-
+# registers the "algorithm2e" xml prefix to point to the algorithm2e namespace
 RegisterNamespace('algorithm2e','http://dlmf.nist.gov/LaTeXML/packages/algorithm2e');
+
+# load the algorithm2e scheme
 RelaxNGSchema('algorithm2e','algorithm2e'=>'http://dlmf.nist.gov/LaTeXML/packages/algorithm2e');
 
-
+# this is the algorithm counter
 NewCounter('algoAlgo', 'document',  idprefix=>'A');
+
+# this is the counter for lines within an algorithm
 NewCounter('algoLine', 'algoAlgo',  idprefix=>'L', idwithin=>'algoAlgo');
 
-DefMacro('\KwSty{}','\texttt{ \textbf{#1}}');
-DefMacro('\While{}{}','\KwSty{while}: #1 \KwSty{do} \algoBeginBlock #2 \algoEndBlock \KwSty{end} \;');
-DefMacro('\eIf{}{}','\KwSty{if}: #1 \KwSty{then} \algoBeginBlock #2 \algoEndBlock \KwSty{end} \;');
-DefMacro('\KwData{}','\KwSty{Data}: #1 \algoEndLine');
-DefMacro('\KwResult{}','\KwSty{Result}: #1 \algoEndLine');
+
+# these are some simple macro expansions
+DefMacro('\KwSty{}',    '\texttt{ \textbf{#1}}');
+DefMacro('\While{}{}',  '\KwSty{while}: #1 \KwSty{do} \algoBeginBlock #2 \algoEndBlock \KwSty{end} \;');
+DefMacro('\eIf{}{}',    '\KwSty{if}: #1 \KwSty{then} \algoBeginBlock #2 \algoEndBlock \KwSty{end} \;');
+DefMacro('\KwData{}',   '\KwSty{Data}: #1 \algoEndLine');
+DefMacro('\KwResult{}', '\KwSty{Result}: #1 \algoEndLine');
 
 DefConstructor('\algoEndLine',sub{
     my $document = shift;
