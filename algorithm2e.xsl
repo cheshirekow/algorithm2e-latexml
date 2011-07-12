@@ -23,21 +23,25 @@
     </xsl:choose>
 </func:function>
 
+<func:function name="f:depth">
+    <func:result> <xsl:value-of select="./@depth"/> </func:result>
+</func:function>
+
 <xsl:template match="algorithm2e:algorithm">
-  <div class="algorithm2e {f:classes(.)}">
+  <div class="algorithm2e-algorithm">
     <xsl:apply-templates/>
   </div>
 </xsl:template>
 
 <xsl:template match="algorithm2e:algorithm/algorithm2e:block">
-  <div class="algorithm2e {f:classes(.)}">
+  <div class="algorithm2e-block-{f:depth}">
     <xsl:apply-templates/>
   </div>
 </xsl:template>
 
 <xsl:template match="algorithm2e:algorithm/algorithm2e:block/algorithm2e:line" xml:space="preserve">
-  <div class="algorithm2e {f:classes(.)} {f:alternate(.)}">
-    <span class="algorithm2e lineno"><xsl:attribute name="style">left: -<xsl:value-of select="30 * ../@depth"/>px</xsl:attribute><xsl:value-of select="./@refnum"/></span> <xsl:apply-templates/>
+  <div class="algorithm2e-line algorithm2e-{f:alternate(.)}">
+    <div class="algorithm2e-lineno"><xsl:value-of select="./@refnum"/></div> <xsl:apply-templates/>
   </div>
   <div style="clear: both;"></div>
 </xsl:template>
