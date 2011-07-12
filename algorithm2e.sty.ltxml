@@ -43,6 +43,7 @@ DefConstructor('\algorithm[]',sub{
     $document->addAttribute("refnum"=>$ref{'refnum'});
     $document->addAttribute("xml:id"=>$ref{'id'});
     $document->openElement("algorithm2e:block");
+    $document->addAttribute("depth"=>$algoDepth);
     $document->openElement("algorithm2e:line");
 },
     beforeDigest=>sub{
