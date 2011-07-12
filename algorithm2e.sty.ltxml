@@ -79,7 +79,7 @@ DefConstructor('\algorithm[]',sub{
 
 DefConstructor('\endalgorithm',sub{
 	my $document = shift;
-	algoEndLine($document);
+	algoCancelLine($document);
 	algoEndBlock($document);
 	algoEndEnv($document);
 },
