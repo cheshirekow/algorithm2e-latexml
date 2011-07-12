@@ -4,7 +4,29 @@ body
     background-color: #AFA;
 }
 
+div.algorithm
+{
+    max-width: 80%;
+    min-width: 300px;
+    margin: 0 auto;
+    border-style: solid;
+    border-color: black;
+    border-width: 1px;
+}
+
 div.line
 {
-    background-color: #FAF
+    border-style: none;
 }
+
+div.a
+{
+    background-color: #FFF;
+}
+
+div.b
+{
+    background-color: #AAA;
+}
+
+
