@@ -33,11 +33,11 @@ NewCounter('algoLine', 'algoAlgo',  idprefix=>'L', idwithin=>'algoAlgo');
 
 
 # these are some simple macro expansions
-DefMacro('\KwSty{}',    '\texttt{ \textbf{#1}}');
+DefMacro('\KwSty{}',    '\textbf{#1}');
 DefMacro('\While{}{}',  '\KwSty{while}: #1 \KwSty{do} \algoBeginBlock #2 \algoEndBlock \KwSty{end} \;');
-DefMacro('\eIf{}{}',    '\KwSty{if}: #1 \KwSty{then} \algoBeginBlock #2 \algoEndBlock \KwSty{end} \;');
-DefMacro('\KwData{}',   '\KwSty{Data}: #1 \algoEndLine');
-DefMacro('\KwResult{}', '\KwSty{Result}: #1 \algoEndLine');
+DefMacro('\eIf{}{}',    '\KwSty{if}: \emph{#1} \KwSty{then} \algoBeginBlock #2 \algoEndBlock \KwSty{end} \;');
+DefMacro('\KwData{}',   '\KwSty{Data}: \emph{#1} \algoEndLine');
+DefMacro('\KwResult{}', '\KwSty{Result}: \emph{#1} \algoEndLine');
 
 
 

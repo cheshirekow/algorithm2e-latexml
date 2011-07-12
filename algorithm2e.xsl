@@ -35,7 +35,7 @@
 </xsl:template>
 
 <xsl:template match="algorithm2e:block" xml:space="preserve">
-  <div class="algorithm2e-block-{f:depth(.)}">
+  <div class="algorithm2e-block algorithm2e-block-{f:depth(.)}">
     <xsl:apply-templates/>
   </div>
 </xsl:template>
@@ -46,7 +46,7 @@
 
     <!--begin_: Line_by_Line_Output -->
     <xsl:if test="$i &lt;= $count">
-    <div class="algorithm2e-spacer algorithm2e-spacer-$i">
+    <div class="algorithm2e-spacer algorithm2e-spacer-{$i}">
       <div class="algorithm2e-spacer-inner">
       </div>
     </div>
@@ -69,7 +69,7 @@
 
 <xsl:template match="algorithm2e:block/algorithm2e:line" xml:space="preserve">
   <div class="algorithm2e-line algorithm2e-{f:alternate(.)}">
-    <div class="algorithm2e-lineno"><xsl:value-of select="./@refnum"/></div> 
+    <div class="algorithm2e-lineno algorithm2e-lineno-{f:depth(..)}"><xsl:value-of select="./@refnum"/></div> 
     <xsl:call-template name="spacer.loop" xml:space="default">
       <xsl:with-param name="i">1</xsl:with-param>
       <xsl:with-param name="count"><xsl:value-of select="../@depth - 1"/></xsl:with-param>
