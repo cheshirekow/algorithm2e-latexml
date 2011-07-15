@@ -40,7 +40,7 @@
 
 <xsl:template match="algorithm2e:caption" xml:space="preserve">
   <div class="algorithm2e-caption">
-    <xsl:apply-templates/>
+    Algorithm <xsl:value-of select="../@refnum"/>. <xsl:apply-templates/>
   </div>
 </xsl:template>
 
