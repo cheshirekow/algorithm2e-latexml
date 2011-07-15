@@ -43,10 +43,13 @@ NewCounter('algoLine', 'algoAlgo',  idprefix=>'L', idwithin=>'algoAlgo');
 
 # these are some simple macro expansions
 DefMacro('\KwSty{}',    '\textbf{#1}');
-DefMacro('\While{}{}',  '\KwSty{while}: #1 \KwSty{do} \algoBeginBlock #2 \algoEndBlock \KwSty{end} \;');
-DefMacro('\eIf{}{}{}',  '\KwSty{if}: \emph{#1} \KwSty{then} \algoBeginBlock #2 \algoEndBlock \KwSty{else} \algoBeginBlock #3 \algoEndBlock \KwSty{end} \;');
-DefMacro('\KwData{}',   '\algoSingleLineNumberOff \KwSty{Data}: \emph{#1} \algoEndLine');
-DefMacro('\KwResult{}', '\algoSingleLineNumberOff \KwSty{Result}: \emph{#1} \algoEndLine');
+DefMacro('\While{}{}',  '\KwSty{while } \emph{#1} \KwSty{ do} \algoBeginBlock #2 \algoEndBlock \KwSty{end} \;');
+DefMacro('\For{}{}',    '\KwSty{for } \emph{#1} \KwSty{ do} \algoBeginBlock #2 \algoEndBlock \KwSty{end} \;');
+DefMacro('\If{}{}',     '\KwSty{if } \emph{#1} \KwSty{ then} \algoBeginBlock #2 \algoEndBlock \KwSty{end} \;');
+DefMacro('\eIf{}{}{}',  '\KwSty{if } \emph{#1} \KwSty{ then} \algoBeginBlock #2 \algoEndBlock \KwSty{else} \algoBeginBlock #3 \algoEndBlock \KwSty{end} \;');
+DefMacro('\KwData{}',   '\algoSingleLineNumberOff \KwSty{Data } {#1} \algoEndLine');
+DefMacro('\KwResult{}', '\algoSingleLineNumberOff \KwSty{Result } {#1} \algoEndLine');
+DefMacro('\Return{}',   '\algoSingleLineNumberOff \KwSty{Return}: {#1} ');
 
 DefMacro('\algoCaption{}',  '\beginAlgoCaption {#1} \endAlgoCaption');
 
