@@ -3,4 +3,4 @@
 
 LATEXML=latexml
 
-$LATEXML --destination=test.xml test.tex
+$LATEXML --path=../algorithm2e --destination=test.xml test.tex
