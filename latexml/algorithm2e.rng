@@ -27,6 +27,7 @@
       <a:documentation>A logical block composing an algorithm</a:documentation>
       <ref name="Common.attributes"/>
       <ref name="Labelled.attributes"/>
+      <ref name="Caption.class"/>
       <ref name="Algorithm.caption"/>
       <ref name="Algorithm.block"/>
     </element>
@@ -42,7 +43,6 @@
     <element name="block" ns="http://dlmf.nist.gov/LaTeXML/packages/algorithm2e" >
       <a:documentation>A logical block which is composed of other logical blocks</a:documentation>
       <ref name="Common.attributes"/>
-      <ref name="Labelled.attributes"/>
       <attribute name="depth"/>
       <ref name="Algorithm.line"/>
       <ref name="Algorithm.block"/>
