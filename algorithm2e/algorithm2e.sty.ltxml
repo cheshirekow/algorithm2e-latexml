@@ -29,10 +29,10 @@ our $currentCaptionNode;
 our $restoreNode;
 
 # registers the "algorithm2e" xml prefix to point to the algorithm2e namespace
-RegisterNamespace('algorithm2e','http://dlmf.nist.gov/LaTeXML/packages/algorithm2e');
+# RegisterNamespace('algorithm2e','http://dlmf.nist.gov/LaTeXML/packages/algorithm2e');
 
-# load the algorithm2e scheme
-RelaxNGSchema('algorithm2e','algorithm2e'=>'http://dlmf.nist.gov/LaTeXML/packages/algorithm2e');
+# load the latxml scheme
+# RelaxNGSchema('LaTeXML','ltx'=>'http://dlmf.nist.gov/LaTeXML');
 
 # this is the algorithm counter
 NewCounter('algoAlgo', 'document',  idprefix=>'A');
@@ -123,12 +123,13 @@ sub algoBeginEnv
 {
     my $document = shift;
     my %ref      = RefStepCounter('algoAlgo');
-    $document->openElement("algorithm2e:algorithm");
+    $document->openElement("ltx:float");
     $document->addAttribute("refnum"=>$ref{'refnum'});
     $document->addAttribute("xml:id"=>$ref{'id'});
-    $document->openElement("algorithm2e:caption");
+    $document->addAttribute("class"=>"algorithm2e");
+    $document->openElement("ltx:caption");
     $currentCaptionNode = $document->getNode;
-    $document->closeElement("algorithm2e:caption");
+    $document->closeElement("ltx:caption");
     $algoDepth   = 0;
     
     $localNumbered = $globalNumbered;
@@ -139,28 +140,30 @@ sub algoBeginEnv
 sub algoEndEnv
 {
 	my $document = shift;
-    $document->closeElement("algorithm2e:algorithm");
+    $document->closeElement("ltx:float");
 }
 
 sub algoBeginBlock
 {
 	my $document = shift;
     $algoDepth = $algoDepth + 1;
-    $document->openElement("algorithm2e:block");
+    $document->openElement("ltx:listingblock");
     $document->addAttribute("depth"=>$algoDepth);
+    $document->addAttribute("class"=>"algorithm2e-block");
 }
 
 sub algoEndBlock
 {
 	my $document = shift;
-	$document->closeElement("algorithm2e:block");
+	$document->closeElement("ltx:listingblock");
 	$algoDepth = $algoDepth - 1;
 }
 
 sub algoBeginLine
 {
     my $document = shift;
-    $currentLineNode = $document->openElement("algorithm2e:line");
+    $currentLineNode = $document->openElement("ltx:p");
+    $document->addAttribute("class"=>"algorithm2e-line");
 }
 
 sub algoEndLine
@@ -176,7 +179,7 @@ sub algoEndLine
     {
     	
     }
-    $document->closeElement("algorithm2e:line");
+    $document->closeElement("ltx:p");
     $singleLineNumberOff = 0;
     $singleLineNumberOn  = 0;
 }
@@ -184,8 +187,8 @@ sub algoEndLine
 sub algoCancelLine
 {
     my $document = shift;
-    my $node = $document->getElement("algorithm2e:line");
-    $document->closeElement("algorithm2e:line");
+    my $node = $document->getElement("ltx:p");
+    $document->closeElement("ltx:p");
     $node->parentNode->removeChild($node);
 }
 
