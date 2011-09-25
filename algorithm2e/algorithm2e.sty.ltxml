@@ -1,15 +1,14 @@
 #!/usr/bin/perl
 # -*- CPERL -*-
 # /=======================================================\ #
-# |  ifthen.sty - Implementation for LaTeXML              | #
+# |  algorithm2e.sty- implementation for LaTeXML          | #
 # |                                                       | #
 # |=======================================================| #
-# | Part of LaTeXML : http://dlmf.nist.gov/LaTeXML/       | #
 # | Copyright (c) 2011 Josh Bialkowski                    | #
 # | Released under the GNU Public License                 | #
 # |=======================================================| #
 # | Author: Josh Bialkowski                               | #
-# | E-mail: jbiakl@mit.edu                                | #
+# | E-mail: jbialk@mit.edu                                | #
 # \=======================================================/ #
 
 package LaTeXML::Package;
@@ -36,6 +35,9 @@ our $restoreNode;
 
 # this is the algorithm counter
 NewCounter('algoAlgo', 'document',  idprefix=>'A');
+
+# this is the counter for blocks within an algorithm
+NewCounter('algoBlock', 'algoAlgo', idprefix=>'B', idwithin=>'algoAlgo');
 
 # this is the counter for lines within an algorithm
 NewCounter('algoLine', 'algoAlgo',  idprefix=>'L', idwithin=>'algoAlgo');
@@ -146,10 +148,13 @@ sub algoEndEnv
 sub algoBeginBlock
 {
 	my $document = shift;
+	my %ref      = RefStepCounter('algoBlock');
     $algoDepth = $algoDepth + 1;
     $document->openElement("ltx:listingblock");
     $document->addAttribute("depth"=>$algoDepth);
     $document->addAttribute("class"=>"algorithm2e-block");
+    $document->addAttribute("refnum"=>$ref{'refnum'});
+    $document->addAttribute("xml:id"=>$ref{'id'});
 }
 
 sub algoEndBlock
@@ -162,8 +167,11 @@ sub algoEndBlock
 sub algoBeginLine
 {
     my $document = shift;
+    my %ref      = RefStepCounter('algoLine');
     $currentLineNode = $document->openElement("ltx:p");
     $document->addAttribute("class"=>"algorithm2e-line");
+    $document->addAttribute("refnum"=>$ref{'refnum'});
+    $document->addAttribute("xml:id"=>$ref{'id'});
 }
 
 sub algoEndLine
@@ -188,8 +196,8 @@ sub algoCancelLine
 {
     my $document = shift;
     my $node = $document->getElement("ltx:p");
-    $document->closeElement("ltx:p");
-    $node->parentNode->removeChild($node);
+    #$document->closeElement("ltx:p");
+    #$node->parentNode->removeChild($node);
 }
 
 
