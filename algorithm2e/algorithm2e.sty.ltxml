@@ -168,11 +168,8 @@ sub algoEndBlock
 sub algoBeginLine
 {
     my $document = shift;
-    my %ref      = RefStepCounter('algoLine');
     $currentLineNode = $document->openElement("ltx:p");
     $document->addAttribute("class"=>"algorithm2e-line");
-    $document->addAttribute("refnum"=>$ref{'refnum'});
-    $document->addAttribute("xml:id"=>$ref{'id'});
 }
 
 sub algoEndLine
