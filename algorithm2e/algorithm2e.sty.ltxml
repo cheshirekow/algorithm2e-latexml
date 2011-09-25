@@ -151,7 +151,7 @@ sub algoBeginBlock
 	my $document = shift;
 	my %ref      = RefStepCounter('algoBlock');
     $algoDepth = $algoDepth + 1;
-    $document->openElement("ltx:listingblock");
+    $document->openElement("ltx:inline-block");
     $document->addAttribute("depth"=>$algoDepth);
     $document->addAttribute("class"=>"algorithm2e-block");
     $document->addAttribute("refnum"=>$ref{'refnum'});
@@ -161,7 +161,7 @@ sub algoBeginBlock
 sub algoEndBlock
 {
 	my $document = shift;
-	$document->closeElement("ltx:listingblock");
+	$document->closeElement("ltx:inline-block");
 	$algoDepth = $algoDepth - 1;
 }
 

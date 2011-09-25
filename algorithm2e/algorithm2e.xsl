@@ -32,7 +32,7 @@
 <xsl:template match="ltx:float[@class='algorithm2e']" xml:space="preserve">
   <div class="algorithm2e-float">
       <div class="algorithm2e-algorithm">
-        <xsl:apply-templates select="ltx:listingblock|ltx:p"/>
+        <xsl:apply-templates select="ltx:inline-block|ltx:p"/>
       </div>
       <br/>
       <xsl:apply-templates select="ltx:caption"/>
@@ -45,7 +45,7 @@
   </div>
 </xsl:template>
 
-<xsl:template match="ltx:listingblock[@class='algorithm2e-block']" xml:space="preserve">
+<xsl:template match="ltx:inline-block[@class='algorithm2e-block']" xml:space="preserve">
     <div class="algorithm2e-block algorithm2e-block-{f:depth(.)}">
       <xsl:apply-templates/>
     </div>
@@ -78,7 +78,7 @@
 
 
 
-<xsl:template match="ltx:listingblock[@class='algorithm2e-block']/ltx:p[@class='algorithm2e-line']" xml:space="preserve">
+<xsl:template match="ltx:inline-block[@class='algorithm2e-block']/ltx:p[@class='algorithm2e-line']" xml:space="preserve">
   <div class="algorithm2e-line algorithm2e-{f:alternate(.)}">
     <div class="algorithm2e-lineno algorithm2e-lineno-{f:depth(..)}"><xsl:value-of select="./@refnum"/></div> 
     <xsl:call-template name="spacer.loop" xml:space="default">
