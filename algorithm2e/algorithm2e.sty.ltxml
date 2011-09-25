@@ -130,6 +130,7 @@ sub algoBeginEnv
     $document->addAttribute("xml:id"=>$ref{'id'});
     $document->addAttribute("class"=>"algorithm2e");
     $document->openElement("ltx:caption");
+    $document->addAttribute("class"=>"algorithm2e-caption");
     $currentCaptionNode = $document->getNode;
     $document->closeElement("ltx:caption");
     $algoDepth   = 0;

@@ -23,31 +23,32 @@
   </xsl:choose>
 </func:function>
 
+
 <func:function name="f:depth">
   <xsl:param name="node"/>
   <func:result> <xsl:value-of select="$node/@depth"/> </func:result>
 </func:function>
 
-<xsl:template match="algorithm2e:algorithm" xml:space="preserve">
+<xsl:template match="ltx:float[@class='algorithm2e']" xml:space="preserve">
   <div class="algorithm2e-float">
-	  <div class="algorithm2e-algorithm">
-	    <xsl:apply-templates select="algorithm2e:block|algorithm2e:line"/>
-	  </div>
-	  <br/>
-	  <xsl:apply-templates select="algorithm2e:caption"/>
+      <div class="algorithm2e-algorithm">
+        <xsl:apply-templates select="ltx:listingblock|ltx:p"/>
+      </div>
+      <br/>
+      <xsl:apply-templates select="ltx:caption"/>
   </div>
 </xsl:template>
 
-<xsl:template match="algorithm2e:caption" xml:space="preserve">
+<xsl:template match="ltx:caption[@class='algorithm2e-caption']" xml:space="preserve">
   <div class="algorithm2e-caption">
     Algorithm <xsl:value-of select="../@refnum"/>. <xsl:apply-templates/>
   </div>
 </xsl:template>
 
-<xsl:template match="algorithm2e:block" xml:space="preserve">
-  <div class="algorithm2e-block algorithm2e-block-{f:depth(.)}">
-    <xsl:apply-templates/>
-  </div>
+<xsl:template match="ltx:listingblock[@class='algorithm2e-block']" xml:space="preserve">
+    <div class="algorithm2e-block algorithm2e-block-{f:depth(.)}">
+      <xsl:apply-templates/>
+    </div>
 </xsl:template>
 
 <xsl:template name="spacer.loop">
@@ -77,7 +78,7 @@
 
 
 
-<xsl:template match="algorithm2e:block/algorithm2e:line" xml:space="preserve">
+<xsl:template match="ltx:listingblock[@class='algorithm2e-block']/ltx:p[@class='algorithm2e-line']" xml:space="preserve">
   <div class="algorithm2e-line algorithm2e-{f:alternate(.)}">
     <div class="algorithm2e-lineno algorithm2e-lineno-{f:depth(..)}"><xsl:value-of select="./@refnum"/></div> 
     <xsl:call-template name="spacer.loop" xml:space="default">
