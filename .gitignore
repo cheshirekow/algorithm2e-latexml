@@ -1,13 +1,6 @@
-*.aux
-*.log
-*.pdf
-*.xml
-*.xhtml
 .project
 .texlipse
-core.css
-*.png
 test.svg
-*.cache
-
 toupload/*
+
+
