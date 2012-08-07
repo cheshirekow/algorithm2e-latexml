@@ -2,7 +2,7 @@ Algorithm2e Bindings for LaTeXML
 =================================
 
 This code provides latexml bindings for the algorithm2e package. You can see
-[a  demo](/test.xhtml "Algorithm2d Demo XHTML") in the same directory as this
+[a  demo](test.xhtml "Algorithm2d Demo XHTML") in the same directory as this
 file. 
 
 
