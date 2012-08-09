@@ -37,6 +37,12 @@ Here is the basic mapping that of pseudocode layout to latexml elements
     pseudo code layout        latexml element        html   class
     ------------------        ---------------        ------ -------
     algorithm            =>   ltx:float         =>   div    algorithm2e
-    block                =>   ltx:float         =>   div    algorithm2e-block
+    block                =>   ltx:inline-block  =>   span   algorithm2e-block
     line                 =>   ltx:p             =>   p      algorithm2e-line
     caption              =>   ltx:caption       =>   div    algorithm2e-caption
+    
+
+The layout is done using some ugly css hacks and several levels of nested 
+elements. Here is a diagram which should illustrate whats going on:
+
+![Layout Method](layout.png)
