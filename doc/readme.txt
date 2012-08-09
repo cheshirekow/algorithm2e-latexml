@@ -46,3 +46,4 @@ The layout is done using some ugly css hacks and several levels of nested
 elements. Here is a diagram which should illustrate whats going on:
 
 ![Layout Method](layout.png)
+![Layout Method](layout_explain.png)

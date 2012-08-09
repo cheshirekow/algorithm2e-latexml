@@ -32,5 +32,7 @@ print $outfile $header;
 print $outfile `markdown readme.txt`;
 print $outfile $footer;
 
-
 close($outfile);
+
+print `inkscape --export-png=layout.png layout.svg`;
+print `inkscape --export-png=layout_explain.png layout_explain.svg`;
