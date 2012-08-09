@@ -47,3 +47,371 @@ elements. Here is a diagram which should illustrate whats going on:
 
 ![Layout Method](layout.png)
 ![Layout Method](layout_explain.png)
+
+There is a demo of this layout using CSS [here](demo.html) and with informative
+outlines [here](demo_debug.html)
+
+
+Implemented Features
+========================
+
+Note that many of the commands in algorithm2e pertain to the style in which 
+the algorithms are typeset (as opposed to the layout structure). The latexml
+binding only handles the positioning, and the unimplemented style settings 
+can be achieved by altering the css file.  
+
+Package options
+----------------
+
+    option                  implemented
+    ------------            ------------
+    algo2e                  [ ]
+    slide                   [ ]
+    norelsize               [n]
+    english                 [ ]
+    french                  [ ]
+    german                  [ ]
+    protugues               [ ]
+    czech                   [ ]                   
+    onelanguage             [ ]
+    figure                  [ ]
+    endfloat                [ ]
+    algopart                [ ]
+    algochapter             [ ]
+    algosection             [ ]
+    procnumbered            [ ]
+    boxed                   [x]
+    boxruled                [x]
+    ruled                   [x]
+    algoruled               [x]
+    tworuled                [x]
+    plain                   [x]
+    lined                   [x]
+    vlined                  [x]
+    noline                  [x]
+    linesnumbered           [x]
+    linesnumberedhidden     [x]
+    commentsnumbered        [x]
+    inoutnumbered           [x]
+    rightnl                 [ ]
+    titlenumbered           [ ]
+    titlenonumbered         [ ]
+    resetcount              [x]
+    noresetcount            [x]
+    algonl                  [ ]
+    longend                 [x]
+    shortend                [x]
+    noend                   [x]
+    dotocloa                [ ]
+    scright                 [ ]
+    scleft                  [ ]
+    fillcomment             [ ]
+    nofillcomment           [ ]
+    nokwfunc                [ ]
+    
+    legend: 
+    [ ] unimplemented
+    [x] implemented
+    [n] not applicable, wont be implemented
+    
+
+
+Commands provided with the package
+-----------------------------------
+
+### Basic typesetting commands
+
+    command                     description                         implemented
+    ------------                -------------------                 ------------
+    \;                          marks the end of the line                   [x]
+    \DontPrintSemicolon         stops printing ';' at the end of lines      [x] 
+    \PrintSemicolon             starts printing ';' at the end of lines     [x]
+    \BlankLine                  prints a blank line                         [x]
+    \Indp                       increases indent                            [ ]
+    \Indm                       decreases indent                            [ ]
+                        
+    legend: 
+    [ ] unimplemented
+    [x] implemented
+    [n] not applicable, wont be implemented
+    
+### environment level stuff
+    
+#### caption title and changing reference
+
+    command                     description                         implemented
+    ------------                -------------------                 ------------
+    \caption{title}             inserts entry into list of                  [x] 
+                                algorithms and puts a title on 
+                                the algorithm
+    \TitleOfAlgo{.}             gives an algorithm a title but no           [ ]
+                                caption, and therefore no entry 
+                                in the list of algorithms
+    \listofalgorithms           inserts the list of all algorithms          [ ]
+                                having a caption
+    \SetAlgoRefName{ref}        changes reference of algorithm to           [ ] 
+                                allow naming but not numbering
+    \SetAlgoRelativeSize{int}   sets the output size of reference           [ ]
+                                in list of algorithms   
+                        
+    legend: 
+    [ ] unimplemented
+    [x] implemented
+    [n] not applicable, wont be implemented
+    
+#### setting style and layout of algorithm, caption, and title
+
+    command                     description                         implemented
+    ------------                -------------------                 ------------
+    \SetAlgoCaptionSeparator{.} sets the separator between the              [x]
+                                title of the algorithms, default
+                                is ':'
+    \SetAlCapSkip{length}       sets the distance between the               [n]
+                                algorithm body and the caption in
+                                plain and boxed mode
+    \SetAlCapHSkip{length}      set the distance between the                [n]
+                                caption and the algorithm body in
+                                ruled mode
+    \SetTitleStyle{style}{size} sets typography and size of titles          [ ]
+                                defined with \TitleofAlgo{}
+    \NoCaptionOfAlgo            doesn't print "Algorithm" and number        [ ]
+                                in the caption, only in ruled and
+                                algoruled mode (for short algos)
+    \RestoreCaptionOfAlgo       restores correct captions corrupted         [ ]
+                                by \NoCaptionOfAlgo 
+    \SetAlgoCaptionLayout{.}    sets the global style of the caption,       [ ]
+                                argument is the name of a macro taking
+                                one argument (the caption text)
+    
+                                                                                        
+    legend: 
+    [ ] unimplemented
+    [x] implemented
+    [n] not applicable, wont be implemented
+
+
+### line numbering
+    
+#### labeling and numbering
+
+    command                     description                         implemented
+    ------------                -------------------                 ------------
+    \AlgoLine                   counter used to number the lines            [ ]
+    \LinesNumbered              makes lines of all following                [x]
+                                algorithms to be auto-numbered              
+    \LinesNumberedHidden        makes lines auto-numbered, but              [x] 
+                                not shown
+    \LinesNotNumbered           makes lines not auto-numbered               [x]
+    \nllabel{label}             labels lines when auto-numbering            [ ]
+                                is active
+    \nl                         numbers the line, must begin the line       [x]
+    \lnl{label}                 numbers and labels the line                 [ ]
+    \nlset{text}                works like \nl except that the
+                                additional argument is the text
+                                to put at the beginning of the line
+    \lnlset{text}{label}        works like \nlset but with text             [ ]
+    \ShowLn                     shows the number of the line when           [ ]
+                                they are currently hidden
+    \ShowLn{label}              shows the number of the line when
+                                hidden, and adds label
+                            
+    legend: 
+    [ ] unimplemented
+    [x] implemented
+    [n] not applicable, wont be implemented
+    
+#### setting the style of lines
+
+    command                     description                         implemented
+    ------------                -------------------                 ------------
+    \SetNlSty{font}{txt}{txt}   defines how to print line numbers,          [ ]
+                                will print <font><txt>#<txt>, 
+                                default is {textbf}{}{}
+    \SetNlSkip{length}          sets the value of the space                 [n]
+                                between line numbers and the text
+    \SetAlgoNLRelativeSize{.}   sets the relative size of line numbers,     [n]
+                                by default they are two sizes smaller
+                                than the algorithm text
+                            
+    legend: 
+    [ ] unimplemented
+    [x] implemented
+    [n] not applicable, wont be implemented
+
+
+### Standard styles
+    
+#### standard font shapes and styles
+
+    command                     description                         implemented
+    ------------                -------------------                 ------------
+    \SetAlFnt                   defines \AlFnt which is a                   [ ]
+                                macro that is executed at the
+                                start of any algorithm to define
+                                the fonts
+    \KwSty{txt}                 sets txt in kw type style                   [x]
+    \SetKwSty{}                 defines \KwStyl                             [ ]
+    \FuncSty{txt}               sets txt in function style                  [x]
+    \SetFuncSty{}               defines \FuncSty                            [ ]
+    \ArgSty                                                                 [x]
+    \SetArgSty                                                              [ ]
+    \DataSty                                                                [x]
+    \SetDataSty                                                             [ ]
+    \CommentSty                                                             [x]
+    \SetCommentSty                                                          [ ]
+    \NlSty                                                                  [x]
+    \SetN1Sty                                                               [ ]
+    \ProcNameSty                                                            [x]
+    \SetProcNameSty                                                         [ ]
+    \ProcArgSty                                                             [x]
+    \SetProcArgSty                                                          [ ]
+                            
+    legend: 
+    [ ] unimplemented
+    [x] implemented
+    [n] not applicable, wont be implemented
+    
+#### caption and title font style
+
+    command                     description                         implemented
+    ------------                -------------------                 ------------
+                            
+    legend: 
+    [ ] unimplemented
+    [x] implemented
+    [n] not applicable, wont be implemented
+    
+### Controlling Layout
+    
+    
+    command                     description                         implemented
+    ------------                -------------------                 ------------
+    \SetAlgoVlined              prints vertical line followed by            [x]
+                                little horizontal line to denote
+                                a block
+    \SetNoline                  doesn't print vertical lines                [x]
+    \SetAlgoLines               prints vertical lines between block         [x]
+                                keywords like start/end
+    \SetAlgoLongEnd                                                         [ ]
+    \SetAlgoShortEnd                                                        [x]
+    \SetAlgoNoEnd                                                           [x]
+    \SetInd{}{}                                                             [n]
+    \Setvlineskip                                                           [n]
+    \SetAlgoSkip                                                            [n]
+    \SetAlgoInsideSkip                                                      [n]
+    \algomargin                                                             [ ]
+    \IncMargin                                                              [ ]
+    \DecMargin                                                              [ ]
+    \SetAlgoNlRelativeSize                                                  [n]
+    \SetAlgoCaptionLayout                                                   [ ]
+    
+                            
+    legend: 
+    [ ] unimplemented
+    [x] implemented
+    [n] not applicable, wont be implemented
+    
+### Comments
+    
+    
+    command                     description                         implemented
+    ------------                -------------------                 ------------
+    \SetSideCommentLeft                                                     [ ]
+    \SetSideCommentRight                                                    [ ]
+    \SetFillComment                                                         [ ]
+    \SetNoFillComment                                                       [ ]
+    
+                            
+    legend: 
+    [ ] unimplemented
+    [x] implemented
+    [n] not applicable, wont be implemented
+    
+    
+Predefined Language Keywords
+-----------------------------------
+
+    command                     description                         implemented
+    ------------                -------------------                 ------------
+    \KwIn                                                                   [ ]
+    \KwOut                                                                  [ ]
+    \KwData                                                                 [ ]
+    \KwResult                                                               [ ]
+    
+    \KwTo                                                                   [ ]
+    \KwRet                                                                  [ ]
+    \Return                                                                 [ ]
+    \Begin{}                                                                [ ]
+    \Begin(){}                                                              [ ]
+    
+    \tcc{}                                                                  [ ]
+    \tcc*{}                                                                 [ ]
+    \tcc*[r|l|hf]{}                                                         [ ]
+    \tcp{}                                                                  [ ]
+    \tcp*{}                                                                 [ ]
+    \tcp*[r|l|h|f]{}                                                        [ ]
+    
+    \If{}{}                                                                 [ ]
+    \If(){}{}                                                               [ ]
+    \uIf{}{}                                                                [ ]
+    \uIf(){}{}                                                              [ ]
+    \lIf{}{}                                                                [ ]
+    \lIf(){}{}                                                              [ ]
+    \ElseIf{}                                                               [ ]
+    \ElseIf(){}                                                             [ ]
+    \uElseIf{}                                                              [ ]
+    \uElseIf(){}                                                            [ ]
+    \lElseIf{}                                                              [ ]
+    \lElseIf(){}                                                            [ ]
+    \Else{}                                                                 [ ]
+    \Else(){}                                                               [ ]
+    \uElse{}                                                                [ ]
+    \uElse(){}                                                              [ ]
+    \lElse{}                                                                [ ]
+    \lElse(){}                                                              [ ]
+    \eIf{}{}{}                                                              [ ]
+    \eIf(){}{}(){}                                                          [ ]
+    \eIf(){}{}{}                                                            [ ]
+    \eIf{}{}(){}                                                            [ ]
+                            
+    \Switch(){}{}                                                           [ ]
+    \Switch{}{}                                                             [ ]
+    \Case{}{}                                                               [ ]
+    \Case(){}{}                                                             [ ]
+    \uCase{}{}                                                              [ ]
+    \uCase(){}{}                                                            [ ]
+    \lCase{}{}                                                              [ ]
+    \lCase(){}{}                                                            [ ]
+    \Other{}                                                                [ ]
+    \Other(){}                                                              [ ]
+    \lOther{}                                                               [ ]
+    \lOther(){}                                                             [ ]
+    
+    \For{}{}                                                                [ ]
+    \For(){}{}                                                              [ ]
+    \lFor{}{}                                                               [ ]
+    \lFor(){}{}                                                             [ ]
+    \While{}{}                                                              [ ]
+    \While(){}{}                                                            [ ]
+    \lWhile{}{}                                                             [ ]
+    \lWhile(){}{}                                                           [ ]
+    \ForEach{}{}                                                            [ ]
+    \ForEach(){}{}                                                          [ ]
+    \lForEach{}{}                                                           [ ]
+    \lForEach(){}{}                                                         [ ]
+    \ForAll{}{}                                                             [ ]
+    \ForAll(){}{}                                                           [ ]
+    \lForAll{}{}                                                            [ ]
+    \lForAll(){}{}                                                          [ ]
+        
+    \Repeat{}{}                                                             [ ]
+    \Repeat(){}{}()                                                         [ ]
+    \Repeat(){}{}                                                           [ ]
+    \Repeat{}{}()                                                           [ ]
+    \lRepeat{}{}                                                            [ ]
+    \lRepeat(){}{}                                                          [ ]
+                            
+    legend: 
+    [ ] unimplemented
+    [x] implemented
+    [n] not applicable, wont be implemented

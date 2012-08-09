@@ -31,17 +31,73 @@ use strict;
 use LaTeXML::Package;
 
 
+our $procString = "procedure";  
+our $algoString = "algorithm";  # this is the string used to start/end our
+                                # environment, it can be changed by the algo2e
+                                # package option so that other algorithm 
+                                # environments may coexist
+    
+# current defaults for all algorithms, is set with package options, and may
+# be altered  by certain commands
+our $globalSettings = 
+{
+    'lines-numbered'    => 1,           # increment line counter at each line
+    'lines-labeled'     => 1,           # print a line label for each line
+    'comments-numbered' => 0,           # includes comments in line numbering
+    'inout-numbered'    => 0,           # makes data input/output be numbered
+    'auto-reset-lines'  => 1,           # each algorithm resets the line counter
+    'print-semicolon'   => 1,           # print the semicolon at line endings
+    'caption-separator' => ':',         # string used between the word "algorithm"
+                                        # and the title of the algorithm
+    'print-caption'     => 1,           # whether or not to print "Algorithm # :"
+                                        # in the title, only applies algo ruled
+                                        # and ruled
+    'lined-style'       => 'noline',    # lined, vlined, noline
+    'boxed-style'       => 'plain',     # boxed, boxruled, ruled, algoruled, tworuled
+    'end-style'         => 'shortend',  # longend, shortend, noend
+};
+
+our $algorithmSettings = $globalSettings;
+our $lineSettings      = 
+{
+    'labels'                => [],  # list of any labels the user has given
+                                    # this line
+    'should-print-number'   => 1,   # true if we should print the line number
+    'should-number'         => 1,   # true if we should generate a number for
+                                    # this line
+    'is-custom-text'        => 0,
+    'number'                => 0,   # the line number for this line, is set to
+                                    # refnum if should-number is true
+    'reftext'               => '',  # this is the text that will be printed
+                                    # whenever \ref{algo:some_label} is
+                                    # used (is set to frefnum)
+    'is-input'              => 0,   # set to true if it's an input line
+    'is-comment'            => 0,   # set to true if it's a comment line
+};
+
 our $algoDepth = 1;             # the depth (in terms of pseudo code blocks)
 
 our $globalNumbered = 1;        # all algos are numbered by default
-our $localNumbered;             # this algo is numbered
+our $globalLined    = 1;        # all algos are lined by default
+our $globalVLined   = 1;        # all algos are vlined by default
+
+our $localNumbered;             # this algo is auto-numbered
+our $localLined;                # this algo is lined
+our $localVLined;               # this algo is vlined
+
 our $singleLineNumberOn;        # this line is numbered 
 our $singleLineNumberOff;       # this line is not numbered
+
+our $lineIsLabeled;             # the current line is labeled
+our $lineIsNumbered;            # the current line is numbered
 
 our $currentLineNumNode;        # pointer to the ltx:p element for the line 
                                 # number of the current line
 our $currentLineNode;           # pointer to the ltx:p element for the line we 
                                 # are currently writing into
+                                
+our $currentAlgorithmNode;      # pointer to the ltx:float at the top level 
+                                # of the current algorithm
 our $currentCaptionNode;        # pointer to the ltx:caption element for the
                                 # algorithm we are currently working on
 our $restoreNode;               # swap space for whatever node is active when
@@ -61,21 +117,572 @@ NewCounter('algoBlock', 'algoAlgo', idprefix=>'B', idwithin=>'algoAlgo');
 NewCounter('algoLine', 'algoAlgo',  idprefix=>'L', idwithin=>'algoAlgo');
 
 
-# these are some simple macro expansions
-DefMacro('\KwSty{}',    '\textbf{#1}');
 
-DefMacro('\While{}{}',  '\KwSty{while} \emph{#1} \KwSty{do}   \algoBeginBlock #2 \algoEndBlock \KwSty{end} \;');
-DefMacro('\For{}{}',    '\KwSty{for  } \emph{#1} \KwSty{do}   \algoBeginBlock #2 \algoEndBlock \KwSty{end} \;');
-DefMacro('\If{}{}',     '\KwSty{if   } \emph{#1} \KwSty{then} \algoBeginBlock #2 \algoEndBlock \KwSty{end} \;');
 
-DefMacro('\eIf{}{}{}',  '\KwSty{if   } \emph{#1} \KwSty{then} \algoBeginBlock #2 \algoEndBlock \KwSty{else} \algoBeginBlock #3 \algoEndBlock \KwSty{end} \;');
+#------------------------------------------------------------------------------
+#                           Package Options
+#------------------------------------------------------------------------------
 
-DefMacro('\KwData{}',   '\algoSingleLineNumberOff \KwSty{Data   }  {#1} \algoEndLine');
-DefMacro('\KwResult{}', '\algoSingleLineNumberOff \KwSty{Result }  {#1} \algoEndLine');
-DefMacro('\Return{}',   '\algoSingleLineNumberOff \KwSty{Return }: {#1} ');
+# the algo2e option changes the string used to enter/exit the algorithm
+# environment. It becomes "algorithm2e"
+DeclareOption("algo2e",
+sub
+{
+    $algoString = "algorithm2e";
+});
+
+# currently unsupported option
+DeclareOption("slide",sub{});
+
+# not applicable for latexml
+DeclareOption("norelsize",sub{});
+
+# currently unsupported, should make algorithms put in classical figure 
+# environment, and therefore added to \listoffigures
+DeclareOption("figure",sub{});
+
+
+# Declare package options which merely set values of the globalSettings
+# structure
+
+# I can't believe this actually works... perl is amazing
+for my $boxstyle( qw(boxed boxruled ruled algoruled tworuled plain) )
+{
+    DeclareOption($boxstyle,
+        sub{$globalSettings->{'boxed-style'} = $boxstyle;}
+    );    
+}
+
+for my $linedstyle( qw(lined vlined noline) )
+{
+    DeclareOption($linedstyle,
+        sub{$globalSettings->{'lined-style'} = $linedstyle;}
+    );    
+}
+
+for my $endstyle( qw(longend shortend noend) )
+{
+    DeclareOption($endstyle,
+        sub{$globalSettings->{'end-style'} = $endstyle;}
+    );
+}
+
+DeclareOption('linesnumbered',
+                            sub{$globalSettings->{'lines-numbered'}     = 1;});
+
+DeclareOption('linesnumberedhidden',
+                            sub{$globalSettings->{'lines-labeled'}   = 0;});
+
+DeclareOption('commentsnumbered',
+                            sub{$globalSettings->{'comments-numbered'} = 1;});    
+
+DeclareOption('inoutnumbered',
+                            sub{$globalSettings->{'inout-numbered'}    = 1;});
+
+DeclareOption('resetcount', 
+                            sub{$globalSettings->{'auto-reset-lines'}  = 1;});
+
+DeclareOption('noresetcount',
+                            sub{$globalSettings->{'auto-reset-lines'}  = 0;});
+                            
+                            
+#------------------------------------------------------------------------------
+#                           Basic Typesetting Commands
+#------------------------------------------------------------------------------
+
+DefConstructor('\DontPrintSemicolon', 
+                            sub{$algorithmSettings->{'print-semicolon'} = 0;});
+DefConstructor('\DontPrintSemicolon', 
+                            sub{$algorithmSettings->{'print-semicolon'} = 1;});
+
+DefConstructor('\BlankLine',  '\algoEndLine');
+
+
+#------------------------------------------------------------------------------
+#                           Setting Global Styles
+#------------------------------------------------------------------------------
+
+DefConstructor('\SetAlgoCaptionSeparator',
+sub
+{
+    my ($gullet,$arg)= @_;
+    $globalSettings->{'caption-separator'} = $arg;    
+});
+
+DefConstructor('\NoCaptionOfAlgo',      sub{$globalSettings->{'print-caption'} = 0;});
+DefConstructor('\RestoreCaptionOfAlgo', sub{$globalSettings->{'print-caption'} = 1;});
+
+
+
+
+
+#------------------------------------------------------------------------------
+#                           Labeling and Numbering
+#------------------------------------------------------------------------------
+
+DefConstructor('\LinesNumbered',        sub{$globalSettings->{'lines-numbered'} = 1;});
+DefConstructor('\LinesNumberedHidden',  sub{$globalSettings->{'lines-labeled'}  = 0;});
+
+# macros for labeling lines 
+# in the latex version \nllabel, \lnl, and \label all kind of do different
+# things, however, since we postpone generating a line number until the
+# line is digested, and each of these macros only makes sense if the line
+# is numbered, we can make them all do the same things
+for my $macroName (qw(\nllabel{} \lnl{} \algoLabel{}))
+{
+    DefMacro($macroName, 
+    sub
+    {
+        # add the new label to the list of labels for this line
+        my ($gullet, $arg) = @_;
+        my $labelArray     = $lineSettings->{'labels'};
+        push( @$labelArray, $arg );
+        
+        # ensure that this line will get a number
+        $lineSettings->{'should-number'} = 1;
+        
+        #return empty list of tokens
+        ()
+    });
+}
+
+
+# indicates that the current line should be numbered. In LaTeX, this must come
+# first in the line, but we don't actually care for latexml
+DefMacro('\nl', 
+sub
+{
+    $lineSettings->{'should-number'} = 1;
+    
+    #return empty list of tokens
+    ()
+});
+
+# set the text for the line "number" output, instead of outputting the actual
+# line number, will also be the text output when we use \ref{} if the 
+# line is labeled
+DefMacro('\nlset{}',
+sub
+{
+    # set the custom text
+    my ($gullet, $arg) = @_;
+    $lineSettings->{'reftext'} = $arg;
+    
+    # set the flag indicating that it is custom text
+    $lineSettings->{'is-custom-text'}=1;
+    
+    #return empty list of tokens
+    ()
+});
+
+# set the text for the line "number" output and a label for the line at the
+# same time
+DefMacro('\nlset{}{}',
+sub
+{
+    # set the custom text
+    my ($gullet, $text, $label) = @_;
+    my $labelArray     = $lineSettings->{'labels'};
+    $lineSettings->{'reftext'} = $text;
+    push( @$labelArray, $label );
+    
+    # set the flag indicating that it is custom text
+    $lineSettings->{'is-custom-text'}=1;
+    
+    #return empty list of tokens
+    ()
+});
+
+# indicates that theline number (or text) should be displayed, even if 
+# the linesnumbered hidden is activated
+DefMacro('\ShowLn',
+sub
+{
+    $lineSettings->{'should-print-number'}=1;
+    
+    #return empty list of tokens
+    ()
+});
+
+# indicates that theline number (or text) should be displayed, and adds a label
+# at the same time
+DefMacro('\ShowLn{}',
+sub
+{
+    # set the custom text
+    my ($gullet, $label) = @_;
+    my $labelArray = $lineSettings->{'labels'};
+    push( @$labelArray, $label );
+    
+    $lineSettings->{'should-print-number'}=1;
+    
+    #return empty list of tokens
+    ()
+});
+
+
+
+
+                            
+# ------------------------------------------------------------------------------
+#                            default style macros
+# ------------------------------------------------------------------------------
+
+# -------------------------------------------------
+#                  Standard Styles
+# -------------------------------------------------
+DefMacro('\KwSty{}'      , '\textbf{#1}'      );
+DefMacro('\FuncSty{}'    , '\texttt{#1}'      );
+DefMacro('\ArgSty{}'     , '\emph{#1}'        );
+DefMacro('\DataSty{}'    , '\textsf{#1}'      );
+DefMacro('\CommentSty{}' , '\texttt{#1}'      );
+DefMacro('\NlSty{}'      , '\relsize{-2}{#1}' );
+DefMacro('\ProcNameSty{}', '\relsize{-2}{#1}' );
+DefMacro('\ProcArgSty{}' , '\relsize{-2}{#1}' );
+
+# -------------------------------------------------
+#              Caption and Title Style
+# -------------------------------------------------
+DefMacro('\AlCapSty{}'      , '\textbf{#1}'     );
+DefMacro('\AlCapNameSty{}'  , '\textnormal{#1}' );
+DefMacro('\AlCapFnt{}'      , '\relax{#1}'      );
+DefMacro('\AlCapNameFnt{}'  , '\relax{#1}'      );
+DefMacro('\AlTitleSty{}'    , '\textbf{#1}'     );
+DefMacro('\AlTitleFnt{}'    , '\relax{#1}'      );
+
+
+
+# macros to redefine styles, each of these macros takes a single argument which
+# is the textual name of a macro which takes a single argument
+for my $styleKey(qw(
+        Kw Func Arg Data Comment ProcName ProcArg 
+        AlCapSty AlCapNameSty AlCapFnt AlCapNameFnt 
+        AlTitleSty AlTitleFnt
+))
+{
+    my $setterMacro = sprintf('\Set%sSty{}', $styleKey);
+    my $styleMacro  = sprintf('\%sSty{}',    $styleKey);
+    
+    DefMacro($setterMacro,
+    sub
+    {
+        my ($gullet, $arg) = @_;
+        DefMacro($styleMacro, sprintf('\%s{#1}', $arg));
+        
+        # return empty token list
+        ();
+    });    
+}
+
+# the NlStyle macro (number line style) takes three arguments. First is the
+# Style macro, then a prefix, then a suffix so that the line printed is like
+# \textbf{ prefix #1 suffix }
+DefMacro('\SetNlSty{}{}{}',
+sub
+{
+    my ($gullet, $font,$pre,$post) = @_;
+    DefMacro('\NlSty{}', sprintf('\%s{ %s #1 %s}', $font,$pre,$post));
+    
+    # return empty token list
+    ();
+});
+
+
+
+
+# ------------------------------------------------------------------------------
+#                            Controlloing Layout
+# ------------------------------------------------------------------------------
+
+# sets the boxed style of all following algorithms
+DefMacro('\RestyleAlgo{}',
+sub{
+    
+    my ($gullet, $arg) = @_;
+    $globalSettings->{'boxed-style'} = $arg;
+    
+    # return empty token list
+    ();
+});
+
+# sets the lined style 
+for my $style( qw( Vlined Noline Lined ) )
+{
+    my $setterMacro = sprintf('\SetAlgo%s', $style);
+    my $value       = lc($style);
+    DefMacro($setterMacro,
+    sub
+    {
+        $globalSettings->{'lined-style'} = $value;    
+        
+        # return empty token list
+        return ();
+    });
+}
+
+# sets the end style
+for my $style( qw(LongEnd ShortEnd NoEnd) )
+{
+    my $setterMacro = sprintf('\SetAlgo%s', $style);
+    my $value       = lc($style);
+    DefMacro($setterMacro,
+    sub
+    {
+        $globalSettings->{'end-style'} = $value;    
+        
+        # return empty token list
+        return ();
+    });
+}
+
+
+# ------------------------------------------------------------------------------
+#                       Utility macros
+# ------------------------------------------------------------------------------
+DefMacro('\algoSetInputLine',
+sub
+{
+    $lineSettings->{'is-input'} = 1;
+});
+
+DefMacro('\algoSetCommentLine',
+sub
+{
+    $lineSettings->{'is-comment'} = 1;
+});
+
+# ------------------------------------------------------------------------------
+#                       Setting new Keywords
+# ------------------------------------------------------------------------------
+our $CreateKwInputMacro = 
+sub
+{
+    my ($gullet,$macro,$text) = @_;    
+    my $command     = sprintf('\%s',$macro);
+    my $expansion   = sprintf('\algoSetInputLine \KwSty{%s}', $text);
+    
+    DefMacro($command,$expansion);
+    
+    # return empty token list
+    ();
+};
+
+
+DefMacro('\SetKwInput{}{}',$CreateKwInputMacro);
+
+our $CreateKwMacro =
+sub
+{
+    my ($gullet, $macro,$text) = @_;    
+    
+    my $command     = sprintf('\%s',$macro);
+    my $expansion   = sprintf('\KwSty{%s}', $text);
+    
+    DefMacro($command,$expansion);
+    
+    # return empty token list
+    ();
+};
+
+DefMacro('\SetKw{}{}',$CreateKwMacro);
+
+
+our $CreateCommentMacro =
+sub
+{
+    my ($gullet, $macro,$open,$close) = @_;    
+    
+    my $command     = sprintf('\%s',$macro);
+    my $expansion   = sprintf('\algoSetCommentLine \CommentSty{ %s #1 %s }', 
+                                $open, $close);
+    
+    DefMacro($command,$expansion);
+    
+    # return empty token list
+    ();
+};
+
+
+DefMacro('\SetKwComment{}{}{}',$CreateCommentMacro);
+
+
+our $CreateIfMacros =
+sub
+{
+    my($gullet,
+        $ifMacro,$elseIfMacro,$elseMacro,
+        $ifString,$thenString,$elseifString,
+        $elseString,$endString) = @_; 
+        
+    # normal if statement with end statement and contents are a block
+    DefMacro(
+        sprintf('\%s{}{}', $ifMacro),
+        sprintf('\KwSty{%s} #1 \KwSty{%s} '
+                .'\algoBeginBlock #2 \algoEndBlock '
+                .'\KwSty{%s} \algoEndLine', 
+                $ifString,
+                $thenString,
+                $endString
+                )
+            );
+    
+    # unfinished if statement, does not print an end so that an else can be
+    # appended
+    DefMacro(
+        sprintf('\u%s{}{}', $ifMacro),
+        sprintf('\KwSty{%s} #1 \KwSty{%s} '
+                .'\algoBeginBlock #2 \algoEndBlock ',
+                $ifString,
+                $thenString
+                )
+            );
+    
+    # single line if statment, then block is on the same line
+    DefMacro(
+        sprintf('\l%s{}{}', $ifMacro),
+        sprintf('\KwSty{%s} #1 \KwSty{%s} #2',
+                $ifString,
+                $thenString
+                )
+            );
+    
+    # same as if except uses 'elseif', used for continuation of uIf or lIf
+    DefMacro(
+        sprintf('\%s{}{}', $elseIfMacro),
+        sprintf('\KwSty{%s} #1 \KwSty{%s} '
+                .'\algoBeginBlock #2 \algoEndBlock '
+                .'\KwSty{%s} \algoEndLine', 
+                $elseifString,
+                $thenString,
+                $endString
+                )
+            );
+    
+    # unfinished elseif
+    DefMacro(
+        sprintf('\u%s{}{}', $elseIfMacro),
+        sprintf('\KwSty{%s} #1 \KwSty{%s} '
+                .'\algoBeginBlock #2 \algoEndBlock ',
+                $elseifString,
+                $thenString
+                )
+            );
+    
+    # single line elseif
+    DefMacro(
+        sprintf('\l%s{}{}', $elseIfMacro),
+        sprintf('\KwSty{%s} #1 \KwSty{%s} #2',
+                $elseifString,
+                $thenString
+                )
+            );
+            
+            
+    # normal else statement with end statement and contents are a block
+    DefMacro(
+        sprintf('\%s{}', $elseMacro),
+        sprintf('\KwSty{%s}  '
+                .'\algoBeginBlock #1 \algoEndBlock '
+                .'\KwSty{%s} \algoEndLine', 
+                $elseString,
+                $endString
+                )
+            );
+    
+    # unfinished else statement, does not print an end so that an else can be
+    # appended
+    DefMacro(
+        sprintf('\u%s{}', $elseMacro),
+        sprintf('\KwSty{%s} '
+                .'\algoBeginBlock #1 \algoEndBlock ',
+                $elseString
+                )
+            );
+    
+    # single line else statment, then block is on the same line
+    DefMacro(
+        sprintf('\l%s{}', $elseMacro),
+        sprintf('\KwSty{%s} #2',
+                $elseString
+                )
+            );
+
+    # combined if-else statement
+    DefMacro('\eIf{}{}{}',  '\uIf{1}{2} \Else{3}');
+   
+   #return empty token list     
+   ();
+};
+
+DefMacro('\SetKwIF{}{}{}{}{}{}{}{}',$CreateIfMacros);
+
+
+
+
+# ------------------------------------------------------------------------------
+#                       Predefined Language Keywords
+# ------------------------------------------------------------------------------
+for my $pairs(  [qw(KwIn     Input)],
+                [qw(KwData   Data)],
+                [qw(KwOut    Output)],
+                [qw(KwResult Result)]  )
+{
+    $CreateKwInputMacro->( 'gullet', $pairs->[0], $pairs->[1] );
+}
+
+for my $pairs(  [qw(KwTo    to)],
+                [qw(KwRet   Return)],
+                [qw(Return  Return)] )
+{
+    $CreateKwMacro->( 'gullet', $pairs->[0], $pairs->[1] );
+}
+
+DefMacro('\tcc{}',      '\CommentSty{ /* #1 */ }'  );
+DefMacro('\tcc*{}',     '\CommentSty{ /* #1 */ }'  );
+DefMacro('\tcp{}',      '\CommentSty{ // #1    }'  );
+DefMacro('\tcp*{}',     '\CommentSty{ // #1    }'  );
+
+DefMacro('\KwEnd',      '\KwSty{end}'       );
+
+# if macros
+CreateIfMacros( qw(gullet If ElseIf Else if then elseif else endif) );
+
+
+# switch statement
+DefMacro('\Switch{}{}',  '\KwSty{switch} #1 '
+                        .'\algoBeginBlock #2 \algoEndBlock '
+                        .'\KwSty{end}');
+
+# case statement
+DefMacro('\Case{}{}',  '\KwSty{case} #1 :'
+                       .'\algoBeginBlock #2 \algoEndBlock '
+                       .'\KwSty{end}');
+
+# unfinished case statement
+DefMacro('\uCase{}{}',  '\KwSty{case} #1 :'
+                       .'\algoBeginBlock #2 \algoEndBlock ');
+                       
+# singe line case statement
+DefMacro('\lCase{}{}',  '\KwSty{case} #1 : #2 ');
+
+# otherwise
+DefMacro('\Other{}',  '\KwSty{otherwise} :'
+                       .'\algoBeginBlock #1 \algoEndBlock '
+                       .'\KwSty{end}');
+
+# singe line otherwise
+DefMacro('\lOther{}',  '\KwSty{otherwise} : #1 ');
+
+
+
+
+
+
+DefMacro('\While{}{}',  '\KwSty{while} #1 \KwSty{do}   \algoBeginBlock #2 \algoEndBlock \KwSty{end} \algoEndLine');
+DefMacro('\For{}{}',    '\KwSty{for  } #1 \KwSty{do}   \algoBeginBlock #2 \algoEndBlock \KwSty{end} \algoEndLine');
 
 DefMacro('\algoCaption{}',  '\beginAlgoCaption {#1} \endAlgoCaption');
-
+    
 
 
 
@@ -138,12 +745,14 @@ DefConstructor('\algorithm[]',
     	# store the current meaning of '\;' and '\caption' so that we can 
     	# restore them later
     	Let('\algoOldSemicolon',   '\;');
-    	Let('\algoOldCaption','    \caption');
+    	Let('\algoOldCaption',     '\caption');
+    	Let('\algoOldLabel',       '\label');
     	
     	# now redefine them to our binding hooks so that we are notified when
     	# these controls are encountered
     	Let('\;'      ,   '\algoEndLine');
     	Let('\caption',   '\algoCaption');
+    	Let('\label',     '\algoLabel');
     }    
 );
 
@@ -164,8 +773,9 @@ DefConstructor('\endalgorithm',
     sub
     {
         my $stomach = shift;
-        Let('\;','\algoOldsemicolon');
-        Let('\caption','\algoOldCaption');
+        Let('\;',       '\algoOldsemicolon');
+        Let('\caption', '\algoOldCaption');
+        Let('\label',   '\algoOldLabel');
     }
 );
 
@@ -245,9 +855,12 @@ sub algoBeginEnv
     # the code block
     $algoDepth   = 0;
 
-    # set the line numbering of this algorithm to be that of the
-    # global setting to start off with    
+    # set the settings of this algorithm to be those of the document defaults,
+    # note that they may be changed when certain macros within the environment
+    # are encountered
     $localNumbered = $globalNumbered;
+    $localLined    = $globalLined;
+    $localVLined   = $globalVLined;
     
     # these variables indicate that the user has specifically stated
     # that a particular line is numbered or not, it can be used to
@@ -350,6 +963,10 @@ sub algoEndLine
     	# and add attributes so that the line can be cross referenced
 	    $currentLineNode->setAttribute("refnum",ToString($ref{'refnum'}));
 	    $currentLineNode->setAttribute("xml:id",ToString($ref{'id'}));
+	    $currentLineNode->setAttribute("label",
+                               sprintf("LABEL:%s user_label_%s",
+                                        ToString($ref{'id'}),
+                                        ToString($ref{'id'})   ) );
     }
     else
     {

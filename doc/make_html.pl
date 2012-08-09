@@ -9,6 +9,8 @@ chdir dirname(abs_path($0))
 
 
 $header = <<'HERE';
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN">
+
 <html>
     <head>
         <link href="http://kevinburke.bitbucket.org/markdowncss/markdown.css" rel="stylesheet"/>
