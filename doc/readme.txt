@@ -22,8 +22,21 @@ Notes
 --------------------------
 
 *   There is a relevant thread on 
-    [the mailing list](http://lists.jacobs-university.de/pipermail/project-latexml/2011-July/000507.html)
+    [the mailing list][]
 *   This code is mostly a proof of concept and has been semi abandoned. I hope
     to get around to it sooner or later. 
+    
+[the mailing list]: http://lists.jacobs-university.de/pipermail/project-latexml/2011-July/000507.html
 
 
+How it works
+--------------------------
+
+Here is the basic mapping that of pseudocode layout to latexml elements
+
+    pseudo code layout        latexml element        html   class
+    ------------------        ---------------        ------ -------
+    algorithm            =>   ltx:float         =>   div    algorithm2e
+    block                =>   ltx:float         =>   div    algorithm2e-block
+    line                 =>   ltx:p             =>   p      algorithm2e-line
+    caption              =>   ltx:caption       =>   div    algorithm2e-caption

@@ -30,19 +30,23 @@ package LaTeXML::Package;
 use strict;
 use LaTeXML::Package;
 
-our $algoDepth = 1;
 
-our $globalNumbered = 1;        #all algos numbered by default
-our $localNumbered;             #this algo numbered
-our $singleLineNumberOn;        #this line numbered 
-our $singleLineNumberOff;       #this line not numbered
+our $algoDepth = 1;             # the depth (in terms of pseudo code blocks)
 
-our $currentLineNode;
-our $currentCaptionNode;
-our $restoreNode;
+our $globalNumbered = 1;        # all algos are numbered by default
+our $localNumbered;             # this algo is numbered
+our $singleLineNumberOn;        # this line is numbered 
+our $singleLineNumberOff;       # this line is not numbered
 
-# registers the "algorithm2e" xml prefix to point to the algorithm2e namespace
-# RegisterNamespace('algorithm2e','http://dlmf.nist.gov/LaTeXML/packages/algorithm2e');
+our $currentLineNumNode;        # pointer to the ltx:p element for the line 
+                                # number of the current line
+our $currentLineNode;           # pointer to the ltx:p element for the line we 
+                                # are currently writing into
+our $currentCaptionNode;        # pointer to the ltx:caption element for the
+                                # algorithm we are currently working on
+our $restoreNode;               # swap space for whatever node is active when
+                                # the caption node needs to be pulled into 
+                                # active duty
 
 # load the latxml scheme
 # RelaxNGSchema('LaTeXML','ltx'=>'http://dlmf.nist.gov/LaTeXML');
@@ -59,25 +63,43 @@ NewCounter('algoLine', 'algoAlgo',  idprefix=>'L', idwithin=>'algoAlgo');
 
 # these are some simple macro expansions
 DefMacro('\KwSty{}',    '\textbf{#1}');
-DefMacro('\While{}{}',  '\KwSty{while } \emph{#1} \KwSty{ do} \algoBeginBlock #2 \algoEndBlock \KwSty{end} \;');
-DefMacro('\For{}{}',    '\KwSty{for } \emph{#1} \KwSty{ do} \algoBeginBlock #2 \algoEndBlock \KwSty{end} \;');
-DefMacro('\If{}{}',     '\KwSty{if } \emph{#1} \KwSty{ then} \algoBeginBlock #2 \algoEndBlock \KwSty{end} \;');
-DefMacro('\eIf{}{}{}',  '\KwSty{if } \emph{#1} \KwSty{ then} \algoBeginBlock #2 \algoEndBlock \KwSty{else} \algoBeginBlock #3 \algoEndBlock \KwSty{end} \;');
-DefMacro('\KwData{}',   '\algoSingleLineNumberOff \KwSty{Data } {#1} \algoEndLine');
-DefMacro('\KwResult{}', '\algoSingleLineNumberOff \KwSty{Result } {#1} \algoEndLine');
-DefMacro('\Return{}',   '\algoSingleLineNumberOff \KwSty{Return}: {#1} ');
+
+DefMacro('\While{}{}',  '\KwSty{while} \emph{#1} \KwSty{do}   \algoBeginBlock #2 \algoEndBlock \KwSty{end} \;');
+DefMacro('\For{}{}',    '\KwSty{for  } \emph{#1} \KwSty{do}   \algoBeginBlock #2 \algoEndBlock \KwSty{end} \;');
+DefMacro('\If{}{}',     '\KwSty{if   } \emph{#1} \KwSty{then} \algoBeginBlock #2 \algoEndBlock \KwSty{end} \;');
+
+DefMacro('\eIf{}{}{}',  '\KwSty{if   } \emph{#1} \KwSty{then} \algoBeginBlock #2 \algoEndBlock \KwSty{else} \algoBeginBlock #3 \algoEndBlock \KwSty{end} \;');
+
+DefMacro('\KwData{}',   '\algoSingleLineNumberOff \KwSty{Data   }  {#1} \algoEndLine');
+DefMacro('\KwResult{}', '\algoSingleLineNumberOff \KwSty{Result }  {#1} \algoEndLine');
+DefMacro('\Return{}',   '\algoSingleLineNumberOff \KwSty{Return }: {#1} ');
 
 DefMacro('\algoCaption{}',  '\beginAlgoCaption {#1} \endAlgoCaption');
 
 
 
 
+# In user code (i.e a latex document) the user only ever gives us an indication
+# of ending a line (\;). We will do layout at the line level so what we'll do
+# is any time we come across one of these line endings we'll put a "line split"
+# in other words we always assume that there is an open "line" xml block. Then,
+# when we hit one of thise (\;) control codes, what we'll do is split that 
+# currently open line, so that everything currently digested goes before the
+# split, and there now "current" line is empty
+#
+# An alternate explanation. There is always a current "line". As we digest code
+# we put it into that line. Then when we hit a (\;) control code, we split that
+# current line after whatever has been digested so far. The left half of that 
+# split is considered done, and the right half is where future digestion
+# gets output.
 DefConstructor('\algoEndLine',sub{
     my $document = shift;
     algoEndLine($document);
     algoBeginLine($document);
 }); 
 
+# When we start a new block we need to close the currenly opened line, then
+# start a new block, and then start a new line within that block
 DefConstructor('\algoBeginBlock',sub{
     my $document = shift;
     algoEndLine($document);
@@ -85,6 +107,8 @@ DefConstructor('\algoBeginBlock',sub{
     algoBeginLine($document);
 });
 
+# when we end a block, we need to close the active line, then close the active
+# block, and then open a new line so that more stuff can be put into it
 DefConstructor('\algoEndBlock',sub{
 	my $document = shift;
 	algoCancelLine($document);
@@ -92,118 +116,248 @@ DefConstructor('\algoEndBlock',sub{
 	algoBeginLine($document);
 });
 
-DefConstructor('\algorithm[]',sub{
-	my $document = shift;
-	algoBeginEnv($document);
-	algoBeginBlock($document);
-	algoBeginLine($document);
-	
-},
-    beforeDigest=>sub{
+
+# when the algorithm environment is started we need to insert some custom 
+# code handlers before digestion proceeds
+DefConstructor('\algorithm[]',
+    sub 
+    {
+        # to start the algorithm block, we open the environment,
+        # then the first block in that environment, then the first line in
+        # that block
+    	my $document = shift;
+    	algoBeginEnv($document);
+    	algoBeginBlock($document);
+    	algoBeginLine($document);
+    },
+    # before digestion, we need to redefine some commands so that 
+    beforeDigest=>
+    sub{
     	my $stomach = shift;
-    	Let('\algoOldSemicolon','\;');
-    	Let('\algoOldCaption','\caption');
-    	Let('\;','\algoEndLine');
-    	Let('\caption','\algoCaption');
+    	
+    	# store the current meaning of '\;' and '\caption' so that we can 
+    	# restore them later
+    	Let('\algoOldSemicolon',   '\;');
+    	Let('\algoOldCaption','    \caption');
+    	
+    	# now redefine them to our binding hooks so that we are notified when
+    	# these controls are encountered
+    	Let('\;'      ,   '\algoEndLine');
+    	Let('\caption',   '\algoCaption');
     }    
 );
 
-DefConstructor('\endalgorithm',sub{
-	my $document = shift;
-	algoCancelLine($document);
-	algoEndBlock($document);
-	algoEndEnv($document);
-},
-    beforeDigest=>sub{
+# when the algorithm environment is ended we need to restore the old definitions
+# for the \; and \caption controls
+DefConstructor('\endalgorithm',
+    sub
+    {
+        # since the algorithm is ended we close the current line and delete it
+        # (because it should be empty) then close the open block and the open
+        # environment
+    	my $document = shift;
+    	algoCancelLine($document);
+    	algoEndBlock($document);
+    	algoEndEnv($document);
+    },
+    beforeDigest=>
+    sub
+    {
         my $stomach = shift;
         Let('\;','\algoOldsemicolon');
         Let('\caption','\algoOldCaption');
     }
 );
 
+# if we encounter a caption for the algorithm, we make the caption element
+# the active element of the document, so that the caption code gets digested
+# into the correct part of the document tree
 DefConstructor('\beginAlgoCaption',sub{
 	my $document = shift;
+	
+	# we cache the current node (whatever it is) so that when the caption is
+	# complete we can make it current again
 	$restoreNode = $document->getNode;
+	
+	# now set the "current" or active node to be the caption element
 	$document->setNode($currentCaptionNode);
 });
 
+# when the caption is digested, we restore whatever active node was set prior
+# to the caption being started
 DefConstructor('\endAlgoCaption',sub{
 	my $document = shift;
 	$document->setNode($restoreNode);
 });
 
+# the \algoSingleLineNumberOff control indicates that this line should not
+# be numbered, so we simply set the flag
 DefConstructor('\algoSingleLineNumberOff',sub{$singleLineNumberOff=1;});
+
+# the \algoSingleLineNumberOn control indicates that this line should be
+# numbered, so we simply set the flag
 DefConstructor('\algoSingleLineNumberOn', sub{$singleLineNumberOn =1;});
 
+
+
+# Begins outputting an algorithm to the xml document
+# 
+# an algorithm environment maps to a <ltx:float> in latxml schema 
+# this in turn maps to an html <div>.
+# signature: algoBeginEnv( $document ) 
 sub algoBeginEnv
 {
+    # parameter is the xml document
     my $document = shift;
+    
+    # create a reference uid by incrementing the 'algorithm'
+    # counter. This counter prefixes the counter number with 'A' so
+    # algorithm 4 would have a ref name of "A4"
     my %ref      = RefStepCounter('algoAlgo');
+    
+    # open the ltx:float element
     $document->openElement("ltx:float");
+    
+    # add the attributes needed for cross referencing
     $document->addAttribute("refnum"=>$ref{'refnum'});
     $document->addAttribute("xml:id"=>$ref{'id'});
+    
+    # add the algorithm2e class name (this will become a css class name in the
+    # class attribute of the html div element)
     $document->addAttribute("class"=>"algorithm2e");
+    
+    # now open a caption child element to the algorithm give it a 
+    # class name of algorithm2e-caption so we can style it, and then
+    # immediately close it. We grab a pointer to this node before we
+    # close it
+    #
+    # The reason we do it this way is that the user may or may not 
+    # include a caption. But if they do it will likely be at the end
+    # of the environment. We need to be able to insert the caption
+    # text wherever we find the caption. 
     $document->openElement("ltx:caption");
     $document->addAttribute("class"=>"algorithm2e-caption");
     $currentCaptionNode = $document->getNode;
     $document->closeElement("ltx:caption");
-    $algoDepth   = 0;
     
+    # initialize the depth to 0. This is the depth in terms of code
+    # blocks (loops, conditionals) and dictates how far to increment
+    # the code block
+    $algoDepth   = 0;
+
+    # set the line numbering of this algorithm to be that of the
+    # global setting to start off with    
     $localNumbered = $globalNumbered;
+    
+    # these variables indicate that the user has specifically stated
+    # that a particular line is numbered or not, it can be used to
+    # override the line numbering setting for the whole algorithm
     $singleLineNumberOff = 0;
     $singleLineNumberOn  = 0;
 }
 
+# End outputting an algorithm to the xml document
+#
+# At the close of the algorithm environment we simply close the 
+# opened ltx:float element
 sub algoEndEnv
 {
 	my $document = shift;
     $document->closeElement("ltx:float");
 }
 
+# Begin outputting a block of algorithm code
+#
+# A block of algorithm code is reprsented in the xml schema by an
+# ltx:inline-block element. 
 sub algoBeginBlock
 {
 	my $document = shift;
+	
+	# increment the block counter so that we can get unique 
+	# reference entry for this block
 	my %ref      = RefStepCounter('algoBlock');
+	
+	# increment the algorithm depth (i.e. how deep in the nested
+	# block structure of the algorithm we are)
     $algoDepth = $algoDepth + 1;
+    
+    # now open the actual element
     $document->openElement("ltx:inline-block");
-    $document->addAttribute("depth"=>$algoDepth);
-    $document->addAttribute("class"=>"algorithm2e-block");
+    
+    # set the depth attribute of the inline-block element to be the
+    # depth of the block (this is an abuse and should be changed, 
+    # perhaps we can use a fixed number of block classes instead)
+    $document->addAttribute(
+        "class"=>sprintf("algorithm2e-block-%d",$algoDepth) );
+    
+    # set the cross reference information based on the counter for
+    # algorithm blocks
     $document->addAttribute("refnum"=>$ref{'refnum'});
     $document->addAttribute("xml:id"=>$ref{'id'});
 }
 
+# End output of a block of algorithm cocde
 sub algoEndBlock
 {
 	my $document = shift;
+	
+	# first close the ltx:inline-block element
 	$document->closeElement("ltx:inline-block");
+	
+	# then we decrement the depth
 	$algoDepth = $algoDepth - 1;
 }
 
+# Starts a new algorithm line
+#
+# A line of pseudo code maps to a ltx:p element
 sub algoBeginLine
 {
     my $document = shift;
+    
+    # we open a ltx:p element, and cache a reference to it. 
     $currentLineNode = $document->openElement("ltx:p");
+    
+    # assign a class name of algoirthm2e-line so that we can style it with
+    # css
     $document->addAttribute("class"=>"algorithm2e-line");
 }
 
+# End output of an algorithm line
 sub algoEndLine
 {
 	my $document = shift;
+	
+	# we may have to do line numbering on this line if
+	#     1. the latex code explicitly sets this line to use numbering
+	#     2. the policy for this algorithm is to do line numbering and the
+	#        latex code has not explicitly turned of line numbering for this
+	#        line
     if($singleLineNumberOn || ($localNumbered && !$singleLineNumberOff) )
     {
+        # if we do need to do line numbering, then we step the counter
     	my %ref = RefStepCounter('algoLine');
+    	
+    	# and add attributes so that the line can be cross referenced
 	    $currentLineNode->setAttribute("refnum",ToString($ref{'refnum'}));
 	    $currentLineNode->setAttribute("xml:id",ToString($ref{'id'}));
     }
     else
     {
-    	
+    	# otherwise, we just do nothing
     }
+    
+    # then we close the opened ltx:p element
     $document->closeElement("ltx:p");
+    
+    # and we reset any explicit settings for "the current line"
     $singleLineNumberOff = 0;
     $singleLineNumberOn  = 0;
 }
 
+# Since we always have one line open, we may need to remove the last line
+# from the document after the algorithm is complete
 sub algoCancelLine
 {
     my $document = shift;

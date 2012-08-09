@@ -4,7 +4,6 @@
 LATEXMLPOST=latexmlpost
 
 $LATEXMLPOST --novalidate \
-                --stylesheet=../algorithm2e/LaTeXML-xhtml.xsl \
                 --destination=test.xhtml \
                 --css=core.css \
                 --css=../algorithm2e/algorithm2e.css \

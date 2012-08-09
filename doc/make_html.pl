@@ -12,7 +12,7 @@ $header = <<'HERE';
 <html>
     <head>
         <link href="http://kevinburke.bitbucket.org/markdowncss/markdown.css" rel="stylesheet"/>
-        <title>MIT Authentication for redmine</title>   
+        <title>Algorithm2e Bindings for LaTeXML</title>   
     </head>
     <body>
     
