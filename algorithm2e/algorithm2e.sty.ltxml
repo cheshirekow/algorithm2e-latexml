@@ -288,8 +288,16 @@ sub algoBeginBlock
     # set the depth attribute of the inline-block element to be the
     # depth of the block (this is an abuse and should be changed, 
     # perhaps we can use a fixed number of block classes instead)
-    $document->addAttribute(
-        "class"=>sprintf("algorithm2e-block-%d",$algoDepth) );
+    if( $algoDepth > 1 )
+    {
+        $document->addAttribute(
+            "class"=>sprintf("algorithm2e-block-x",$algoDepth) );
+    }
+    else
+    {
+        $document->addAttribute(
+            "class"=>sprintf("algorithm2e-block-0",$algoDepth) );
+    }
     
     # set the cross reference information based on the counter for
     # algorithm blocks
