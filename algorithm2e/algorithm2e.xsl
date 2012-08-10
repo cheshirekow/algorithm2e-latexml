@@ -68,12 +68,15 @@
     </div>
 </xsl:template>
 
-<!-- 
+
 <xsl:template match="ltx:caption[@class='algorithm2e-caption']" xml:space="preserve">
   <div class="algorithm2e-caption">
-    Algorithm <xsl:value-of select="../@refnum"/>. <xsl:apply-templates/>
+    <xsl:apply-templates/>
   </div>
 </xsl:template>
+
+
+<!-- 
 
 <xsl:template match="ltx:inline-block[@class='algorithm2e-block']" xml:space="preserve">
     <div class="algorithm2e-block algorithm2e-block-{f:depth(.)}">

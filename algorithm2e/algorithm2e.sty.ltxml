@@ -161,41 +161,43 @@ DeclareOption("figure",sub{});
 for my $boxstyle( qw(boxed boxruled ruled algoruled tworuled plain) )
 {
     DeclareOption($boxstyle,
-        sub{$globalSettings->{'boxed-style'} = $boxstyle;}
+        sub{$globalSettings->{'boxed-style'} = $boxstyle; return;}
     );    
 }
 
 for my $linedstyle( qw(lined vlined noline) )
 {
     DeclareOption($linedstyle,
-        sub{$globalSettings->{'lined-style'} = $linedstyle;}
+        sub{$globalSettings->{'lined-style'} = $linedstyle; return;}
     );    
 }
 
 for my $endstyle( qw(longend shortend noend) )
 {
     DeclareOption($endstyle,
-        sub{$globalSettings->{'end-style'} = $endstyle;}
+        sub{$globalSettings->{'end-style'} = $endstyle; return;}
     );
 }
 
 DeclareOption('linesnumbered',
-                            sub{$globalSettings->{'lines-numbered'}  = 1;});
+                            sub{printf("\n\nSetting Lines numbered\n");$globalSettings->{'lines-numbered'}  = 1; return;});
 
 DeclareOption('linesnumberedhidden',
-                            sub{$globalSettings->{'lines-labeled'}   = 0;});
+                            sub{$globalSettings->{'lines-labeled'}   = 0; return;});
 
 DeclareOption('commentsnumbered',
-                            sub{$globalSettings->{'comments-numbered'} = 1;});    
+                            sub{$globalSettings->{'comments-numbered'} = 1; return;});    
 
 DeclareOption('inoutnumbered',
-                            sub{$globalSettings->{'input-numbered'}    = 1;});
+                            sub{$globalSettings->{'input-numbered'}    = 1; return;});
 
 DeclareOption('resetcount', 
-                            sub{$globalSettings->{'auto-reset-lines'}  = 1;});
+                            sub{$globalSettings->{'auto-reset-lines'}  = 1; return;});
 
 DeclareOption('noresetcount',
-                            sub{$globalSettings->{'auto-reset-lines'}  = 0;});
+                            sub{$globalSettings->{'auto-reset-lines'}  = 0; return;});
+                            
+ProcessOptions();
                             
                             
 #------------------------------------------------------------------------------
@@ -1118,6 +1120,11 @@ sub algoBeginEnv
 # opened ltx:float element
 sub algoEndEnv
 {
+    # attach styles to the algorithm block
+    $currentAlgorithmNode->setAttribute("class"=>sprintf(
+        "algorithm2e algorithm2e-%s", $algorithmSettings->{'boxed-style'}
+    )); 
+    
 	my $document = shift;
     $document->closeElement("ltx:float");
 }
