@@ -40,10 +40,11 @@
         <xsl:apply-templates select="ltx:inline-block|ltx:p"/>
     </div>
   </div>
-  </div>
+  <div class="algorithm2e-clear"></div>
   <xsl:if test="contains(concat(' ',@class,' '), 'algorithm2e-plain') or contains(concat(' ',@class,' '), 'algorithm2e-boxed') ">
       <xsl:apply-templates select="ltx:caption"/>        
   </xsl:if>
+  </div>
 </xsl:template>
 
 

@@ -8,9 +8,6 @@ div.algorithm2e-container
 div.algorithm2e
 {
   text-align:     left;
-  margin-left:    auto;
-  margin-right:   auto;
-  
   display: inline-block;
   max-width:     80%;
 }
@@ -80,6 +77,8 @@ div.algorithm2e-underbar-vlined
 div.algorithm2e-line
 {
   position:   relative;
+  padding:    0px;
+  margin:     0px;
 }
 
 div.algorithm2e-lineno-pos
@@ -144,7 +143,7 @@ p.algorithm2e-line-text
 /*
   border:      1px solid #001dff;
 */
-  padding:      2px;
+  padding:      0px 2px;
   margin:       0px;
   padding-left: 20px;
   text-indent:  -20px;
@@ -152,13 +151,17 @@ p.algorithm2e-line-text
 
 div.algorithm2e-caption
 {
+/*
   border:        1px solid black;
   margin:        1px;
-  margin-left:   auto;
-  margin-right:  auto;
-  width:         60%;
+*/
+  margin-top:    10px;
+  text-align:    left;
+  display:       inline-block;
+  max-width:     60%;
   min-width:     600px;
   padding:       1px;
+  whitespace:    normal;
 }
 
 div.algorithm2e-caption-ruled
@@ -177,6 +180,12 @@ span.algorithm2e-kw
 {
   font-family: monospace;
   font-weight: bold;
+}
+
+div.algorithm2e-clear
+{
+     width:  0px;
+     height: 0px;
 }
                 
 p.algorithm2e-lineno-0{ right:    0px; }

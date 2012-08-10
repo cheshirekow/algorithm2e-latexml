@@ -23,7 +23,7 @@ $borderWidth    = 1;    # how wide are the border and lines
 
 # how wide are the rule which are drawn in the "ruled" algorithm2e style
 $ruleWidth      = 2*$borderWidth;
-                        
+
 $blockMargin    = 5;    # the size of the margin in a code block with
                         # depth > 0, see layout.svg 
 $blockPadding   = 5;    # the size of the padding in a code block with
@@ -44,6 +44,7 @@ $lineNoPad      = 5;    # how much the line numbers should be padded from the
                         # right, will be the distance between the lineno and the
                         # text of the line
 $minWidth       = 600;  # minimum width of an algorithm block
+$captionMargin  = 10;   # space to leave under algorithm before caption
 
 
 # this is where we'll store the calculated offsets for positioning line numbers
@@ -88,9 +89,6 @@ div.algorithm2e-container
 div.algorithm2e
 {
   text-align:     left;
-  margin-left:    auto;
-  margin-right:   auto;
-  
   display: inline-block;
   max-width:     80%;
 }
@@ -160,6 +158,8 @@ div.algorithm2e-underbar-vlined
 div.algorithm2e-line
 {
   position:   relative;
+  padding:    0px;
+  margin:     0px;
 }
 
 div.algorithm2e-lineno-pos
@@ -224,7 +224,7 @@ p.algorithm2e-line-text
 $openComment
   border:      ${borderWidth}px solid #001dff;
 $closeComment
-  padding:      2px;
+  padding:      0px 2px;
   margin:       0px;
   padding-left: ${lineIndent}px;
   text-indent:  -${lineIndent}px;
@@ -232,13 +232,17 @@ $closeComment
 
 div.algorithm2e-caption
 {
+$openComment
   border:        ${borderWidth}px solid black;
   margin:        ${debugMargin}px;
-  margin-left:   auto;
-  margin-right:  auto;
-  width:         60%;
+$closeComment
+  margin-top:    ${captionMargin}px;
+  text-align:    left;
+  display:       inline-block;
+  max-width:     60%;
   min-width:     ${minWidth}px;
   padding:       1px;
+  whitespace:    normal;
 }
 
 div.algorithm2e-caption-ruled
@@ -257,6 +261,12 @@ span.algorithm2e-kw
 {
   font-family: monospace;
   font-weight: bold;
+}
+
+div.algorithm2e-clear
+{
+     width:  0px;
+     height: 0px;
 }
                 
 HERE
