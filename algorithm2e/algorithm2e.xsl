@@ -29,12 +29,9 @@
     exclude-result-prefixes = "ltx f func string">
 
 
-<xsl:template match="ltx:float[contains(concat(' ',@class,' '), 'algorithm2e')]">
+<xsl:template match="ltx:float[contains(concat(' ',@class,' '), 'algorithm2e')]" xml:space="preserve">
   <div class="algorithm2e-container">
-  <div>
-    <xsl:attribute name="class">
-        <xsl:value-of select="./@class"/>    
-    </xsl:attribute>
+  <div><xsl:attribute name="class"><xsl:value-of select="./@class"/></xsl:attribute>
     <xsl:if test="contains(concat(' ',@class,' '), 'algorithm2e-ruled') or contains(concat(' ',@class,' '), 'algorithm2e-tworuled')">
       <xsl:apply-templates select="ltx:caption"/>
     </xsl:if>
@@ -50,20 +47,14 @@
 </xsl:template>
 
 
-<xsl:template match="ltx:inline-block[@class='algorithm2e-block-0']|ltx:inline-block[@class='algorithm2e-block-x']">
-    <div>
-      <xsl:attribute name="class">
-          <xsl:value-of select="./@class"/>
-      </xsl:attribute>
+<xsl:template match="ltx:inline-block[@class='algorithm2e-block-0']|ltx:inline-block[@class='algorithm2e-block-x']" xml:space="preserve">
+    <div><xsl:attribute name="class"><xsl:value-of select="./@class"/></xsl:attribute>
       <xsl:apply-templates select="ltx:inline-block|ltx:p"/>
     </div>
 </xsl:template>
 
-<xsl:template match="ltx:inline-block[@class='algorithm2e-block-0']|ltx:inline-block[@class='algorithm2e-block-x']|ltx:inline-block[@class='algorithm2e-line']|ltx:inline-block[@class='algorithm2e-lineno-pos']">
-    <div>
-      <xsl:attribute name="class">
-          <xsl:value-of select="./@class"/>
-      </xsl:attribute>
+<xsl:template match="ltx:inline-block[@class='algorithm2e-block-0']|ltx:inline-block[@class='algorithm2e-block-x']|ltx:inline-block[@class='algorithm2e-line']|ltx:inline-block[@class='algorithm2e-lineno-pos']" xml:space="preserve">
+    <div><xsl:attribute name="class"><xsl:value-of select="./@class"/></xsl:attribute>
       <xsl:apply-templates select="ltx:inline-block|ltx:p"/>
     </div>
 </xsl:template>

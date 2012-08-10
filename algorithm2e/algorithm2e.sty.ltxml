@@ -60,6 +60,7 @@ our $globalSettings =
                                         # the label constructor to deal with
                                         # line labels and algorithm labels 
                                         # separately
+    'algo-number'       => 0,           # set by the counter in BeginEnv
 };
 
 our $algorithmSettings = $globalSettings;
@@ -661,7 +662,7 @@ sub
     # normal if statement with end statement and contents are a block
     DefMacro(
         sprintf('\%s{}{}', $ifMacro),
-        sprintf('\KwSty{%s} \ArgSty{ #1 } \KwSty{%s} '
+        sprintf('\KwSty{%s } \ArgSty{ #1 } \KwSty{ %s} '
                 .'\algoBeginBlock #2 \algoEndBlock '
                 .'\algoEndStatement{ \KwSty{%s} } \algoEndLine', 
                 $ifString,
@@ -674,7 +675,7 @@ sub
     # appended
     DefMacro(
         sprintf('\u%s{}{}', $ifMacro),
-        sprintf('\KwSty{%s} \ArgSty{ #1 } \KwSty{%s} '
+        sprintf('\KwSty{%s } \ArgSty{ #1 } \KwSty{ %s} '
                 .'\algoBeginBlock #2 \algoEndBlock ',
                 $ifString,
                 $thenString
@@ -684,7 +685,7 @@ sub
     # single line if statment, then block is on the same line
     DefMacro(
         sprintf('\l%s{}{}', $ifMacro),
-        sprintf('\KwSty{%s} \ArgSty{ #1 } \KwSty{%s} #2',
+        sprintf('\KwSty{%s } \ArgSty{ #1 } \KwSty{ %s} #2',
                 $ifString,
                 $thenString
                 )
@@ -693,7 +694,7 @@ sub
     # same as if except uses 'elseif', used for continuation of uIf or lIf
     DefMacro(
         sprintf('\%s{}{}', $elseIfMacro),
-        sprintf('\KwSty{%s} \ArgSty{ #1 } \KwSty{%s} '
+        sprintf('\KwSty{%s } \ArgSty{ #1 } \KwSty{ %s} '
                 .'\algoBeginBlock #2 \algoEndBlock '
                 .'\algoEndStatement{ \KwSty{%s} } \algoEndLine', 
                 $elseifString,
@@ -705,7 +706,7 @@ sub
     # unfinished elseif
     DefMacro(
         sprintf('\u%s{}{}', $elseIfMacro),
-        sprintf('\KwSty{%s} \ArgSty{ #1 } \KwSty{%s} '
+        sprintf('\KwSty{%s } \ArgSty{ #1 } \KwSty{ %s} '
                 .'\algoBeginBlock #2 \algoEndBlock ',
                 $elseifString,
                 $thenString
@@ -715,7 +716,7 @@ sub
     # single line elseif
     DefMacro(
         sprintf('\l%s{}{}', $elseIfMacro),
-        sprintf('\KwSty{%s} \ArgSty{ #1 } \KwSty{%s} #2',
+        sprintf('\KwSty{%s } \ArgSty{ #1 } \KwSty{ %s} #2',
                 $elseifString,
                 $thenString
                 )
@@ -772,7 +773,7 @@ sub
     # switch statement
     DefMacro(
         sprintf('\%s{}{}', $switchMacro),  
-        sprintf('\KwSty{%s} \ArgSty{ #1 } \KwSty{%s} '
+        sprintf('\KwSty{%s } \ArgSty{ #1 } \KwSty{ %s} '
                 .'\algoBeginBlock #2 \algoEndBlock '
                 .'\algoEndStatement{ \KwSty{%s} } \algoEndLine',
                 $switchString,
@@ -784,7 +785,7 @@ sub
     # case statement
     DefMacro(
         sprintf('\%s{}{}', $caseMacro),  
-        sprintf('\KwSty{%s} \ArgSty{ #1 } '
+        sprintf('\KwSty{%s } \ArgSty{ #1 } '
                 .'\algoBeginBlock #2 \algoEndBlock ',
                 $caseString
                ) 
@@ -793,7 +794,7 @@ sub
     # unfinished case statement
     DefMacro(
         sprintf('\u%s{}{}', $caseMacro),  
-        sprintf('\KwSty{%s} \ArgSty{ #1 }  '
+        sprintf('\KwSty{%s } \ArgSty{ #1 }  '
                 .'\algoBeginBlock #2 \algoEndBlock ',
                 $caseString
                ) 
@@ -802,7 +803,7 @@ sub
     # singe line case statement
     DefMacro(
         sprintf('\l%s{}{}', $caseMacro),  
-        sprintf('\KwSty{%s} \ArgSty{ #1 }  #2',
+        sprintf('\KwSty{%s } \ArgSty{ #1 }  #2',
                 $caseString
                ) 
         );
@@ -838,7 +839,7 @@ sub
     # usual forloop
     DefMacro(
         sprintf('\%s{}{}', $forMacro),  
-        sprintf('\KwSty{%s} \ArgSty{ #1 } \KwSty{%s} '
+        sprintf('\KwSty{%s } \ArgSty{ #1 } \KwSty{ %s} '
                 .'\algoBeginBlock #2 \algoEndBlock '
                 .'\algoEndStatement{ \KwSty{%s} } \algoEndLine',
                 $forString,
@@ -850,7 +851,7 @@ sub
     # single line
     DefMacro(
         sprintf('\l%s{}{}', $forMacro),  
-        sprintf('\KwSty{%s} \ArgSty{ #1 } \KwSty{%s} #2 ',
+        sprintf('\KwSty{%s } \ArgSty{ #1 } \KwSty{ %s} #2 ',
                 $forString,
                 $doString
                ) 
@@ -869,9 +870,9 @@ sub
     # usual forloop
     DefMacro(
         sprintf('\%s{}{}', $repeatMacro),  
-        sprintf('\KwSty{%s} '
+        sprintf('\KwSty{%s } '
                 .'\algoBeginBlock #2 \algoEndBlock '
-                .'\KwSty{%s} \ArgSty{ #1 } ',
+                .'\KwSty{%s } \ArgSty{ #1 } ',
                 $repeatString,
                 $untilString
                ) 
@@ -880,7 +881,7 @@ sub
     # single line
     DefMacro(
         sprintf('\l%s{}{}', $repeatMacro),  
-        sprintf('\KwSty{%s} #2 \KwSty{%s} \ArgSty{ #1 } ',
+        sprintf('\KwSty{%s } #2 \KwSty{ %s } \ArgSty{ #1 } ',
                 $repeatString,
                 $untilString
                ) 
@@ -931,7 +932,13 @@ $CreateRepeatMacros->( qw( gullet DoWhile  do     while ) );
 
 
 
-DefMacro('\algoCaption{}',  '\beginAlgoCaption {#1} \endAlgoCaption');
+DefMacro('\algoCaption{}',  
+    '\beginAlgoCaption \AlCapSty{\AlCapFnt{ Algorithm \constructAlgoNum : }}  {#1} \endAlgoCaption');
+    
+DefConstructor('\constructAlgoNum',sub{
+    my $document = shift;
+    $document->absorb( Digest(Tokenize( $algorithmSettings->{'algo-number'} )));
+});
 
 
 
@@ -1112,7 +1119,9 @@ sub algoBeginEnv
     # note that they may be changed when certain macros within the environment
     # are encountered
     $algorithmSettings= dclone($globalSettings);
+    $algorithmSettings->{'algo-number'} = $ref{'refnum'};
 }
+
 
 # End outputting an algorithm to the xml document
 #
