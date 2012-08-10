@@ -58,12 +58,12 @@ our $globalSettings =
 };
 
 our $algorithmSettings = $globalSettings;
-our $lineSettings      = 
+our $defaultLineSettings      = 
 {
     'labels'                => [],  # list of any labels the user has given
                                     # this line
-    'should-print-number'   => 1,   # true if we should print the line number
-    'should-number'         => 1,   # true if we should generate a number for
+    'should-print-number'   => 0,   # true if we should print the line number
+    'should-number'         => 0,   # true if we should generate a number for
                                     # this line
     'is-custom-text'        => 0,
     'number'                => 0,   # the line number for this line, is set to
@@ -74,6 +74,8 @@ our $lineSettings      =
     'is-input'              => 0,   # set to true if it's an input line
     'is-comment'            => 0,   # set to true if it's a comment line
 };
+
+our $lineSettings     = $defaultLineSettings;
 
 our $algoDepth = 1;             # the depth (in terms of pseudo code blocks)
 
@@ -91,7 +93,7 @@ our $singleLineNumberOff;       # this line is not numbered
 our $lineIsLabeled;             # the current line is labeled
 our $lineIsNumbered;            # the current line is numbered
 
-our $currentLineNumNode;        # pointer to the ltx:p element for the line 
+our $currentLineLabelNode;      # pointer to the ltx:p element for the line 
                                 # number of the current line
 our $currentLineNode;           # pointer to the ltx:p element for the line we 
                                 # are currently writing into
@@ -236,7 +238,7 @@ for my $macroName (qw(\nllabel{} \lnl{} \algoLabel{}))
         # add the new label to the list of labels for this line
         my ($gullet, $arg) = @_;
         my $labelArray     = $lineSettings->{'labels'};
-        push( @$labelArray, $arg );
+        push( @$labelArray, CleanLabel($arg) );
         
         # ensure that this line will get a number
         $lineSettings->{'should-number'} = 1;
@@ -443,12 +445,17 @@ DefMacro('\algoSetInputLine',
 sub
 {
     $lineSettings->{'is-input'} = 1;
+    
+    #return empty token liest
+    ();
 });
 
 DefMacro('\algoSetCommentLine',
 sub
 {
     $lineSettings->{'is-comment'} = 1;
+    #return empty token liest
+    ();
 });
 
 # ------------------------------------------------------------------------------
@@ -458,8 +465,8 @@ our $CreateKwInputMacro =
 sub
 {
     my ($gullet,$macro,$text) = @_;    
-    my $command     = sprintf('\%s',$macro);
-    my $expansion   = sprintf('\algoSetInputLine \KwSty{%s}', $text);
+    my $command     = sprintf('\%s{}',$macro);
+    my $expansion   = sprintf('\algoSetInputLine \KwSty{%s} #1 \algoEndLine', $text);
     
     DefMacro($command,$expansion);
     
@@ -617,6 +624,133 @@ sub
 DefMacro('\SetKwIF{}{}{}{}{}{}{}{}',$CreateIfMacros);
 
 
+our $CreateSwitchMacros =
+sub
+{
+     my($gullet,
+        $switchMacro,     $caseMacro,   $otherMacro,
+        $switchString,    $doString,    $caseString,
+        $otherwiseString, $endString ) = @_;
+        
+    # switch statement
+    DefMacro(
+        sprintf('\%s{}{}', $switchMacro),  
+        sprintf('\KwSty{%s} #1 \KwSty{%s} '
+                .'\algoBeginBlock #2 \algoEndBlock '
+                .'\KwSty{%s}',
+                $switchString,
+                $doString,
+                $endString
+               ) 
+        );
+    
+    # case statement
+    DefMacro(
+        sprintf('\%s{}{}', $caseMacro),  
+        sprintf('\KwSty{%s} #1  '
+                .'\algoBeginBlock #2 \algoEndBlock ',
+                $caseString
+               ) 
+        );
+        
+    # unfinished case statement
+    DefMacro(
+        sprintf('\u%s{}{}', $caseMacro),  
+        sprintf('\KwSty{%s} #1  '
+                .'\algoBeginBlock #2 \algoEndBlock ',
+                $caseString
+               ) 
+        );
+        
+    # singe line case statement
+    DefMacro(
+        sprintf('\l%s{}{}', $caseMacro),  
+        sprintf('\KwSty{%s} #1  #2',
+                $caseString
+               ) 
+        );
+    
+    # otherwise
+    DefMacro(
+        sprintf('\%s{}', $otherMacro),  
+        sprintf('\KwSty{%s}   '
+                .'\algoBeginBlock #2 \algoEndBlock ',
+                $otherwiseString
+               ) 
+        );
+    
+    # singe line otherwise
+    DefMacro(
+        sprintf('\l%s{}', $otherMacro),  
+        sprintf('\KwSty{%s} #2',
+                $otherwiseString
+               ) 
+        );    
+};
+
+DefMacro('\SetKwSwitch{}{}{}{}{}{}{}{}',$CreateSwitchMacros);
+
+
+
+our $CreateForMacros =
+sub
+{
+     my($gullet,
+        $forMacro, $forString, $doString,  $endString ) = @_;
+        
+    # usual forloop
+    DefMacro(
+        sprintf('\%s{}{}', $forMacro),  
+        sprintf('\KwSty{%s} #1 \KwSty{%s} '
+                .'\algoBeginBlock #2 \algoEndBlock '
+                .'\KwSty{%s}',
+                $forString,
+                $doString,
+                $endString
+               ) 
+        );
+        
+    # single line
+    DefMacro(
+        sprintf('\l%s{}{}', $forMacro),  
+        sprintf('\KwSty{%s} #1 \KwSty{%s} #2 ',
+                $forString,
+                $doString
+               ) 
+        );
+};
+
+DefMacro('\SetKwFor{}{}{}{}',$CreateForMacros);
+
+
+our $CreateRepeatMacros =
+sub
+{
+     my($gullet,
+        $repeatMacro, $repeatString, $untilString) = @_;
+        
+    # usual forloop
+    DefMacro(
+        sprintf('\%s{}{}', $repeatMacro),  
+        sprintf('\KwSty{%s} '
+                .'\algoBeginBlock #2 \algoEndBlock '
+                .'\KwSty{%s} #1 ',
+                $repeatString,
+                $untilString
+               ) 
+        );
+        
+    # single line
+    DefMacro(
+        sprintf('\l%s{}{}', $repeatMacro),  
+        sprintf('\KwSty{%s} #2 \KwSty{%s} #1 ',
+                $repeatString,
+                $untilString
+               ) 
+        );
+};
+
+DefMacro('\SetKwRepeat{}{}{}',$CreateForMacros);
 
 
 # ------------------------------------------------------------------------------
@@ -637,52 +771,31 @@ for my $pairs(  [qw(KwTo    to)],
     $CreateKwMacro->( 'gullet', $pairs->[0], $pairs->[1] );
 }
 
-DefMacro('\tcc{}',      '\CommentSty{ /* #1 */ }'  );
-DefMacro('\tcc*{}',     '\CommentSty{ /* #1 */ }'  );
-DefMacro('\tcp{}',      '\CommentSty{ // #1    }'  );
-DefMacro('\tcp*{}',     '\CommentSty{ // #1    }'  );
+
 
 DefMacro('\KwEnd',      '\KwSty{end}'       );
 
-# if macros
-CreateIfMacros( qw(gullet If ElseIf Else if then elseif else endif) );
+# if/else macros
+$CreateIfMacros->( qw(gullet If ElseIf Else if then elseif else endif) );
 
+# switch/case
+$CreateSwitchMacros->( qw(gullet Switch Case Other switch do case otherwise endsw) );
 
-# switch statement
-DefMacro('\Switch{}{}',  '\KwSty{switch} #1 '
-                        .'\algoBeginBlock #2 \algoEndBlock '
-                        .'\KwSty{end}');
+# for, while, foreach
+$CreateForMacros->( qw(gullet For      for      do  endfor) );
+$CreateForMacros->( qw(gullet While    while    do  endw) );
+$CreateForMacros->( qw(gullet ForEach  foreach  do  endfch) );
+$CreateForMacros->( qw(gullet ForAll   forall   do  endfall) );
 
-# case statement
-DefMacro('\Case{}{}',  '\KwSty{case} #1 :'
-                       .'\algoBeginBlock #2 \algoEndBlock '
-                       .'\KwSty{end}');
-
-# unfinished case statement
-DefMacro('\uCase{}{}',  '\KwSty{case} #1 :'
-                       .'\algoBeginBlock #2 \algoEndBlock ');
-                       
-# singe line case statement
-DefMacro('\lCase{}{}',  '\KwSty{case} #1 : #2 ');
-
-# otherwise
-DefMacro('\Other{}',  '\KwSty{otherwise} :'
-                       .'\algoBeginBlock #1 \algoEndBlock '
-                       .'\KwSty{end}');
-
-# singe line otherwise
-DefMacro('\lOther{}',  '\KwSty{otherwise} : #1 ');
+# repeat/until  do/while
+$CreateRepeatMacros->( qw( gullet Repeat   repeat until ) );
+$CreateRepeatMacros->( qw( gullet DoWhile  do     while ) );
 
 
 
-
-
-
-DefMacro('\While{}{}',  '\KwSty{while} #1 \KwSty{do}   \algoBeginBlock #2 \algoEndBlock \KwSty{end} \algoEndLine');
-DefMacro('\For{}{}',    '\KwSty{for  } #1 \KwSty{do}   \algoBeginBlock #2 \algoEndBlock \KwSty{end} \algoEndLine');
 
 DefMacro('\algoCaption{}',  '\beginAlgoCaption {#1} \endAlgoCaption');
-    
+
 
 
 
@@ -826,6 +939,7 @@ sub algoBeginEnv
     my %ref      = RefStepCounter('algoAlgo');
     
     # open the ltx:float element
+    $currentAlgorithmNode =
     $document->openElement("ltx:float");
     
     # add the attributes needed for cross referencing
@@ -845,9 +959,9 @@ sub algoBeginEnv
     # include a caption. But if they do it will likely be at the end
     # of the environment. We need to be able to insert the caption
     # text wherever we find the caption. 
+    $currentCaptionNode =
     $document->openElement("ltx:caption");
     $document->addAttribute("class"=>"algorithm2e-caption");
-    $currentCaptionNode = $document->getNode;
     $document->closeElement("ltx:caption");
     
     # initialize the depth to 0. This is the depth in terms of code
@@ -858,15 +972,7 @@ sub algoBeginEnv
     # set the settings of this algorithm to be those of the document defaults,
     # note that they may be changed when certain macros within the environment
     # are encountered
-    $localNumbered = $globalNumbered;
-    $localLined    = $globalLined;
-    $localVLined   = $globalVLined;
-    
-    # these variables indicate that the user has specifically stated
-    # that a particular line is numbered or not, it can be used to
-    # override the line numbering setting for the whole algorithm
-    $singleLineNumberOff = 0;
-    $singleLineNumberOn  = 0;
+    %{ $algorithmSettings }  = %{ $globalSettings };
 }
 
 # End outputting an algorithm to the xml document
@@ -938,47 +1044,119 @@ sub algoBeginLine
     my $document = shift;
     
     # we open a ltx:p element, and cache a reference to it. 
-    $currentLineNode = $document->openElement("ltx:p");
+    
+    # this is the container for the line, it is a div in html
+    $document->openElement("ltx:inline-block");
+    $document->addAttribute("class"=>"algorithm2e-line");
+    
+    # this is the placeholder for the label
+    $document->openElement("ltx:inline-block");
+    $document->addAttribute("class"=>"algorithm2e-lineno-pos");
+    
+    # this is the actual label element, a ltx:p
+    $currentLineLabelNode =
+    $document->openElement("ltx:p");
+    $document->addAttribute("class"=>
+            sprintf("algorithm2e-lineno algorithm2e-lineno-%d",$algoDepth-1) );
+            
+    # we can close these last two nodes
+    $document->closeElement("ltx:p");
+    $document->closeElement("ltx:inline-block");
+    
+    # and this is the actual contents of the line
+    $currentLineNode = 
+    $document->openElement("ltx:p");
     
     # assign a class name of algoirthm2e-line so that we can style it with
     # css
-    $document->addAttribute("class"=>"algorithm2e-line");
+    $document->addAttribute("class"=>"algorithm2e-line-text");
+    
+    # initialize the line settings to the defaults
+    %{ $lineSettings } = %{ $defaultLineSettings }
 }
 
 # End output of an algorithm line
 sub algoEndLine
 {
 	my $document = shift;
+	my %ref;
 	
-	# we may have to do line numbering on this line if
+	# we may have to assign the line a number if
 	#     1. the latex code explicitly sets this line to use numbering
 	#     2. the policy for this algorithm is to do line numbering and the
 	#        latex code has not explicitly turned of line numbering for this
 	#        line
-    if($singleLineNumberOn || ($localNumbered && !$singleLineNumberOff) )
+	my $shouldNumber = 
+	( 
+    	$lineSettings->{'should-number'}
+	       || (    $algorithmSettings->{'lines-labeled'} 
+                    && ! $lineSettings->{'is_input'}
+                    && ! $lineSettings->{'is_comment'} )
+           || (    $algorithmSettings->{'inout-numbered'}
+                    &&   $lineSettings->{'is_input'} )
+           || (    $algorithmSettings->{'comments-numbered'}
+                    &&   $lineSettings->{'is_comment'} )
+    );
+	
+	if( $shouldNumber )
     {
-        # if we do need to do line numbering, then we step the counter
-    	my %ref = RefStepCounter('algoLine');
-    	
-    	# and add attributes so that the line can be cross referenced
-	    $currentLineNode->setAttribute("refnum",ToString($ref{'refnum'}));
-	    $currentLineNode->setAttribute("xml:id",ToString($ref{'id'}));
-	    $currentLineNode->setAttribute("label",
-                               sprintf("LABEL:%s user_label_%s",
-                                        ToString($ref{'id'}),
-                                        ToString($ref{'id'})   ) );
+        %ref = RefStepCounter('algoLine');
     }
     else
     {
-    	# otherwise, we just do nothing
+        %ref = RefStepID('algoLine');
+    }
+	
+	# assign the latexml attributes that we need
+    $currentLineNode->setAttribute("refnum",ToString($ref{'refnum'}));
+    $currentLineNode->setAttribute("xml:id",ToString($ref{'id'}));
+
+    # assign any labels that the user has created for this line
+    my $labelsRef = $lineSettings->{'labels'};
+    my @labels;
+    
+    foreach my $label(@$labelsRef)
+    {
+        push(@labels, sprintf("%s", $label));
     }
     
-    # then we close the opened ltx:p element
-    $document->closeElement("ltx:p");
+    $currentLineNode->setAttribute("label", join(' ', @labels));
     
-    # and we reset any explicit settings for "the current line"
-    $singleLineNumberOff = 0;
-    $singleLineNumberOn  = 0;
+    
+    # then we close the opened ltx:p element and it's containing 
+    # inline-block element
+    $document->closeElement("ltx:p");
+    $document->closeElement("ltx:inline-block");
+    
+    my $shouldLabel = 
+    (
+        $lineSettings->{'should-print-number'}
+        || $algorithmSettings->{'lines-labeled'}
+    ) && $shouldNumber;     
+           
+    if( $shouldLabel )
+    {
+        # now, in the event that the line label needs to be output, we fill it
+        # here, so start by grabbing a pointer to the current node
+        my $returnMeToTheThrone = $document->getNode;
+        
+        # make the label node the active node
+        $document->setNode($currentLineLabelNode);
+        
+        if($lineSettings->{'is-custom-text'})
+        {
+            # need to write out the text here
+        }
+        else
+        {
+            # format and then write out the text here
+        }
+        
+        
+        # restore the old current node
+        $document->setNode($returnMeToTheThrone);
+    }
+    
 }
 
 # Since we always have one line open, we may need to remove the last line
@@ -987,8 +1165,8 @@ sub algoCancelLine
 {
     my $document = shift;
     my $node = $document->getElement("ltx:p");
-    #$document->closeElement("ltx:p");
-    #$node->parentNode->removeChild($node);
+    $document->closeElement("ltx:p");
+    $document->closeElement("ltx:inline-block");
 }
 
 
