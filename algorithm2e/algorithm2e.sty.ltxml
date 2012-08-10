@@ -29,7 +29,7 @@ package LaTeXML::Package;
 
 use strict;
 use LaTeXML::Package;
-
+use Storable qw(dclone);
 
 our $procString = "procedure";  
 our $algoString = "algorithm";  # this is the string used to start/end our
@@ -80,7 +80,7 @@ our $defaultLineSettings      =
 };
 
 our $lineSettings     = {};
-%{$lineSettings} = %{$defaultLineSettings};
+$lineSettings         = dclone($defaultLineSettings);
 
 our $algoDepth = 1;             # the depth (in terms of pseudo code blocks)
 
@@ -1089,7 +1089,7 @@ sub algoBeginEnv
     # set the settings of this algorithm to be those of the document defaults,
     # note that they may be changed when certain macros within the environment
     # are encountered
-    %{ $algorithmSettings }  = %{ $globalSettings };
+    $algorithmSettings= dclone($globalSettings);
 }
 
 # End outputting an algorithm to the xml document
@@ -1187,7 +1187,7 @@ sub algoBeginLine
     $document->addAttribute("class"=>"algorithm2e-line-text");
     
     # initialize the line settings to the defaults
-    %{ $lineSettings } = %{ $defaultLineSettings }
+    $lineSettings =  dclone($defaultLineSettings);
 }
 
 # End output of an algorithm line
