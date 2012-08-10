@@ -21,7 +21,6 @@
     version     = "1.0"
     xmlns:xsl   = "http://www.w3.org/1999/XSL/Transform"
     xmlns:ltx   = "http://dlmf.nist.gov/LaTeXML"
-    xmlns:algorithm2e  = "http://dlmf.nist.gov/LaTeXML/packages/algorithm2e"
     xmlns       = "http://www.w3.org/1999/xhtml"
     xmlns:string= "http://exslt.org/strings"
     xmlns:func  = "http://exslt.org/functions"
@@ -29,34 +28,47 @@
     extension-element-prefixes="func f"
     exclude-result-prefixes = "ltx f func string">
 
-<func:function name="f:alternate">
-  <xsl:param name="node"/>
-  <xsl:choose>
-    <xsl:when test="@refnum mod 2 = 0">
-      <func:result>line-a</func:result>
-    </xsl:when>
-    <xsl:otherwise>
-      <func:result>line-b</func:result>
-    </xsl:otherwise>
-  </xsl:choose>
-</func:function>
 
-
-<func:function name="f:depth">
-  <xsl:param name="node"/>
-  <func:result> <xsl:value-of select="$node/@depth"/> </func:result>
-</func:function>
-
-<xsl:template match="ltx:float[@class='algorithm2e']" xml:space="preserve">
-  <div class="algorithm2e-float">
-      <div class="algorithm2e-algorithm">
-        <xsl:apply-templates select="ltx:inline-block|ltx:p"/>
-      </div>
-      <br/>
+<xsl:template match="ltx:float[contains(concat(' ',@class,' '), 'algorithm2e')]">
+  <div class="algorithm2e-container">
+  <div>
+    <xsl:attribute name="class">
+        <xsl:value-of select="./@class"/>    
+    </xsl:attribute>
+    <xsl:if test="contains(concat(' ',@class,' '), 'algorithm2e-ruled') or contains(concat(' ',@class,' '), 'algorithm2e-tworuled')">
       <xsl:apply-templates select="ltx:caption"/>
+    </xsl:if>
+    
+    <div class="algorithm2e-right">
+        <xsl:apply-templates select="ltx:inline-block|ltx:p"/>
+    </div>
   </div>
+  </div>
+  <xsl:if test="contains(concat(' ',@class,' '), 'algorithm2e-plain') or contains(concat(' ',@class,' '), 'algorithm2e-boxed') ">
+      <xsl:apply-templates select="ltx:caption"/>        
+  </xsl:if>
 </xsl:template>
 
+
+<xsl:template match="ltx:inline-block[@class='algorithm2e-block-0']|ltx:inline-block[@class='algorithm2e-block-x']">
+    <div>
+      <xsl:attribute name="class">
+          <xsl:value-of select="./@class"/>
+      </xsl:attribute>
+      <xsl:apply-templates select="ltx:inline-block|ltx:p"/>
+    </div>
+</xsl:template>
+
+<xsl:template match="ltx:inline-block[@class='algorithm2e-block-0']|ltx:inline-block[@class='algorithm2e-block-x']|ltx:inline-block[@class='algorithm2e-line']|ltx:inline-block[@class='algorithm2e-lineno-pos']">
+    <div>
+      <xsl:attribute name="class">
+          <xsl:value-of select="./@class"/>
+      </xsl:attribute>
+      <xsl:apply-templates select="ltx:inline-block|ltx:p"/>
+    </div>
+</xsl:template>
+
+<!-- 
 <xsl:template match="ltx:caption[@class='algorithm2e-caption']" xml:space="preserve">
   <div class="algorithm2e-caption">
     Algorithm <xsl:value-of select="../@refnum"/>. <xsl:apply-templates/>
@@ -68,32 +80,6 @@
       <xsl:apply-templates/>
     </div>
 </xsl:template>
-
-<xsl:template name="spacer.loop">
-    <xsl:param name="i" />
-    <xsl:param name="count" />
-
-    <!--begin_: Line_by_Line_Output -->
-    <xsl:if test="$i &lt;= $count">
-    <div class="algorithm2e-spacer algorithm2e-spacer-{$i}">
-      <div class="algorithm2e-spacer-inner">
-      </div>
-    </div>
-    </xsl:if>
-
-    <!--begin_: RepeatTheLoopUntilFinished-->
-    <xsl:if test="$i &lt;= $count">
-      <xsl:call-template name="spacer.loop">
-        <xsl:with-param name="i">
-          <xsl:value-of select="$i + 1"/>
-        </xsl:with-param>
-        <xsl:with-param name="count">
-          <xsl:value-of select="$count"/>
-        </xsl:with-param>
-      </xsl:call-template>
-    </xsl:if>
-</xsl:template>
-
 
 
 <xsl:template match="ltx:inline-block[@class='algorithm2e-block']/ltx:p[@class='algorithm2e-line']" xml:space="preserve">
@@ -109,5 +95,6 @@
   </div>
   <div style="clear: both;"></div>
 </xsl:template>
+ -->
 
 </xsl:stylesheet>

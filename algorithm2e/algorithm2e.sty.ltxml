@@ -371,9 +371,9 @@ DefMacro('\FuncSty{}'    , '\texttt{#1}'      );
 DefMacro('\ArgSty{}'     , '\emph{#1}'        );
 DefMacro('\DataSty{}'    , '\textsf{#1}'      );
 DefMacro('\CommentSty{}' , '\texttt{#1}'      );
-DefMacro('\NlSty{}'      , '\relsize{-2}{#1}' );
-DefMacro('\ProcNameSty{}', '\relsize{-2}{#1}' );
-DefMacro('\ProcArgSty{}' , '\relsize{-2}{#1}' );
+DefMacro('\NlSty{}'      , '\textnormal{#1}' );
+DefMacro('\ProcNameSty{}', '\textbf{#1}' );
+DefMacro('\ProcArgSty{}' , '\texttt{#1}' );
 
 # -------------------------------------------------
 #              Caption and Title Style
@@ -648,7 +648,7 @@ sub
             );
 
     # combined if-else statement
-    DefMacro('\eIf{}{}{}',  '\uIf{1}{2} \Else{3}');
+    DefMacro('\eIf{}{}{}',  '\uIf{#1}{#2} \Else{#3}');
    
    #return empty token list     
    ();
@@ -1153,7 +1153,11 @@ sub algoEndLine
         push(@labels, sprintf("%s", $label));
     }
     
-    $currentLineNode->setAttribute("label", join(' ', @labels));
+    my $labelString = join(' ',@labels);
+    if( length($labelString) > 0 )
+    {
+        $currentLineNode->setAttribute("label", join(' ', @labels));
+    }
     
     
     # then we close the opened ltx:p element and it's containing 
@@ -1182,6 +1186,11 @@ sub algoEndLine
         }
         else
         {
+            # Send the line number through the digestive track
+            $document->absorb(
+                 Digest(Tokenize( sprintf('\NlSty{ %d }',$ref{'refnum'}) )) );
+            
+            
             # format and then write out the text here
         }
         
@@ -1197,8 +1206,8 @@ sub algoEndLine
 sub algoCancelLine
 {
     my $document = shift;
-    my $node = $document->getElement("ltx:p");
-    $document->closeElement("ltx:p");
+    $document->setNode($currentLineNode);
+    $document->maybeCloseElement("ltx:p");
     $document->closeElement("ltx:inline-block");
 }
 
