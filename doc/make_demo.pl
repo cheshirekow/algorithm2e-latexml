@@ -17,6 +17,8 @@ $debugMargin    = 1;    # how much margin to add in debug mode
 
 $debugSize      = 10;   # how big to make zero sized elements in debug mode
 
+$labelMargin    = 50;   # how much margin to leave for line labels
+
 $borderWidth    = 1;    # how wide are the border and lines
 
 # how wide are the rule which are drawn in the "ruled" algorithm2e style
@@ -70,7 +72,7 @@ for $debug (0,1)
         if($debug)
         {
             $offsets[$depth]+= 3*($borderWidth+$debugMargin)
-                               + $debugSize;
+                               + $debugSize + 2*$borderWidth;
         }
     }
     
@@ -83,13 +85,21 @@ for $debug (0,1)
     <title>LaTeXML Algorithm2e Layout Fiddle</title>
     <style type="text/css">
     
+div.algorithm2e-container
+{
+    text-align: center;
+    float:      clear;
+}
+    
+    
 div.algorithm2e
 {
+  text-align:     left;
   margin-left:    auto;
   margin-right:   auto;
   
-  width:     80%;
-  min-width: ${minWidth}px;
+  display:        inline-block;
+  max-width:      80%;
 }
 
 div.algorithm2e-boxed
@@ -109,7 +119,7 @@ $openComment
   border:      ${borderWidth}px solid #c900b8;
   margin:      ${debugMargin}px;
 $closeComment
-  margin-left: 50px;
+  margin-left: ${labelMargin}px;
   padding:     1px;
 }
           
@@ -161,12 +171,14 @@ div.algorithm2e-line
 
 div.algorithm2e-lineno-pos
 {
-$openComment
-  border:   ${borderWidth}px solid #0e9600;
-$closeComment
   position: relative;
   width:    0px;
   height:   0px;
+$openComment
+  border:   ${borderWidth}px solid #0e9600;
+  width:    ${debugSize}px;
+  height:   ${debugSize}px;
+$closeComment
 }
 
 span.algorithm2e-lineno-anchor
@@ -179,7 +191,7 @@ span.algorithm2e-lineno-anchor
 $openComment
   border:   ${borderWidth}px solid #0e9600;
   background-color: #0e9600;
-  width:    ${debugSize}x;
+  width:    ${debugSize}px;
   height:   ${debugSize}px;
 $closeComment
 }
@@ -276,8 +288,8 @@ $document .= <<"HERE";
     </head>
     
     <body>
-    
-    
+
+<div class="algorithm2e-container">
   <div class="algorithm2e algorithm2e-boxed">
     <div class="algorithm2e-right">
       <div class="algorithm2e-block-0">
@@ -414,9 +426,11 @@ $document .= <<"HERE";
     information about the algorithm. It really is very long. Look
     at how many lines it takes up.</span>
   </div>
-  
+</div>
+    
   <div style="height: 50px"></div>
-  
+
+<div class="algorithm2e-container">  
   <div class="algorithm2e algorithm2e-ruled">
     <div class="algorithm2e-caption-ruled">
         <span class="algorithm2e-label">Algorithm 2:</span>
@@ -532,9 +546,11 @@ $document .= <<"HERE";
       </div>
     </div>
   </div>
-  
+</div>
+
   <div style="height: 50px"></div>
-  
+
+<div class="algorithm2e-container">  
   <div class="algorithm2e algorithm2e-boxed">
     <div class="algorithm2e-right">
       <div class="algorithm2e-block-0">
@@ -667,6 +683,7 @@ $document .= <<"HERE";
     of anchoring the line labels that hopefully will keep them bottom-aligned
     with the baseline of the first text line in the paragraph.</span>
   </div>
+</div>
   
   </body>
 </html>

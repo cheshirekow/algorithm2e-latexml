@@ -5,13 +5,21 @@
     <title>LaTeXML Algorithm2e Layout Fiddle</title>
     <style type="text/css">
     
+div.algorithm2e-container
+{
+    text-align: center;
+    float:      clear;
+}
+    
+    
 div.algorithm2e
 {
+  text-align:     left;
   margin-left:    auto;
   margin-right:   auto;
   
-  width:     80%;
-  min-width: 600px;
+  display:        inline-block;
+  max-width:      80%;
 }
 
 div.algorithm2e-boxed
@@ -83,12 +91,14 @@ div.algorithm2e-line
 
 div.algorithm2e-lineno-pos
 {
-/*
-  border:   1px solid #0e9600;
-*/
   position: relative;
   width:    0px;
   height:   0px;
+/*
+  border:   1px solid #0e9600;
+  width:    10px;
+  height:   10px;
+*/
 }
 
 span.algorithm2e-lineno-anchor
@@ -101,7 +111,7 @@ span.algorithm2e-lineno-anchor
 /*
   border:   1px solid #0e9600;
   background-color: #0e9600;
-  width:    10x;
+  width:    10px;
   height:   10px;
 */
 }
@@ -201,8 +211,8 @@ span.algorithm2e-lineno-9{ right:   99px; }
     </head>
     
     <body>
-    
-    
+
+<div class="algorithm2e-container">
   <div class="algorithm2e algorithm2e-boxed">
     <div class="algorithm2e-right">
       <div class="algorithm2e-block-0">
@@ -339,9 +349,11 @@ span.algorithm2e-lineno-9{ right:   99px; }
     information about the algorithm. It really is very long. Look
     at how many lines it takes up.</span>
   </div>
-  
+</div>
+    
   <div style="height: 50px"></div>
-  
+
+<div class="algorithm2e-container">  
   <div class="algorithm2e algorithm2e-ruled">
     <div class="algorithm2e-caption-ruled">
         <span class="algorithm2e-label">Algorithm 2:</span>
@@ -457,9 +469,11 @@ span.algorithm2e-lineno-9{ right:   99px; }
       </div>
     </div>
   </div>
-  
+</div>
+
   <div style="height: 50px"></div>
-  
+
+<div class="algorithm2e-container">  
   <div class="algorithm2e algorithm2e-boxed">
     <div class="algorithm2e-right">
       <div class="algorithm2e-block-0">
@@ -592,6 +606,7 @@ span.algorithm2e-lineno-9{ right:   99px; }
     of anchoring the line labels that hopefully will keep them bottom-aligned
     with the baseline of the first text line in the paragraph.</span>
   </div>
+</div>
   
   </body>
 </html>

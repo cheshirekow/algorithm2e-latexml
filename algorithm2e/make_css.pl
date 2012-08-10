@@ -15,6 +15,10 @@ chdir dirname(abs_path($0))
 
 $debugMargin    = 1;    # how much margin to add in debug mode
 
+$debugSize      = 10;   # how big to make zero sized elements in debug mode
+
+$labelMargin    = 50;   # how much margin to leave for line labels
+
 $borderWidth    = 1;    # how wide are the border and lines
 
 # how wide are the rule which are drawn in the "ruled" algorithm2e style
@@ -68,6 +72,7 @@ for $debug (0,1)
         if($debug)
         {
             $offsets[$depth]+= 3*($borderWidth+$debugMargin)
+                                + $debugSize + 2*$borderWidth;
         }
     }
     
@@ -107,7 +112,7 @@ $openComment
   border:      ${borderWidth}px solid #c900b8;
   margin:      ${debugMargin}px;
 $closeComment
-  margin-left: 50px;
+  margin-left: ${labelMargin}px;
   padding:     1px;
 }
           
@@ -159,12 +164,29 @@ div.algorithm2e-line
 
 div.algorithm2e-lineno-pos
 {
-$openComment
-  border:   ${borderWidth}px solid #0e9600;
-$closeComment
   position: relative;
   width:    0px;
   height:   0px;
+$openComment
+  border:   ${borderWidth}px solid #0e9600;
+  width:    ${debugSize}px;
+  height:   ${debugSize}px;
+$closeComment
+}
+
+span.algorithm2e-lineno-anchor
+{
+  display:        inline-block;
+  vertical-align: bottom;
+  position:       relative;
+  width:    0px;
+  height:   0px;
+$openComment
+  border:   ${borderWidth}px solid #0e9600;
+  background-color: #0e9600;
+  width:    ${debugSize}px;
+  height:   ${debugSize}px;
+$closeComment
 }
 
 p.algorithm2e-lineno
@@ -179,6 +201,22 @@ $closeComment
   padding-right: ${lineNoPad}px;
   margin:        0px;
   font-size:     smaller;
+}
+
+span.algorithm2e-lineno
+{
+$openComment
+  border:           ${borderWidth}px solid #f5b131;
+  background-color: #f5b131;
+$closeComment
+  font-size:     smaller;
+  display:       inline-block;
+  text-align:    right;
+  position:      absolute;
+  bottom:        0px;
+  padding:       0px;
+  padding-right: ${lineNoPad}px;
+  margin:        0px;
 }
 
 p.algorithm2e-line-text
