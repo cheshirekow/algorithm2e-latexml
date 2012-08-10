@@ -44,7 +44,7 @@ our $globalSettings =
     'lines-numbered'    => 1,           # increment line counter at each line
     'lines-labeled'     => 1,           # print a line label for each line
     'comments-numbered' => 0,           # includes comments in line numbering
-    'inout-numbered'    => 0,           # makes data input/output be numbered
+    'input-numbered'    => 0,           # makes data input/output be numbered
     'auto-reset-lines'  => 1,           # each algorithm resets the line counter
     'print-semicolon'   => 1,           # print the semicolon at line endings
     'caption-separator' => ':',         # string used between the word "algorithm"
@@ -72,10 +72,15 @@ our $defaultLineSettings      =
                                     # whenever \ref{algo:some_label} is
                                     # used (is set to frefnum)
     'is-input'              => 0,   # set to true if it's an input line
+                                    # construction flag
     'is-comment'            => 0,   # set to true if it's a comment line
+                                    # construction flag
+    'is-hidden'             => 0,   # set to true if this is an end[x] line
+                                    # construction flag
 };
 
-our $lineSettings     = $defaultLineSettings;
+our $lineSettings     = {};
+%{$lineSettings} = %{$defaultLineSettings};
 
 our $algoDepth = 1;             # the depth (in terms of pseudo code blocks)
 
@@ -170,7 +175,7 @@ for my $endstyle( qw(longend shortend noend) )
 }
 
 DeclareOption('linesnumbered',
-                            sub{$globalSettings->{'lines-numbered'}     = 1;});
+                            sub{$globalSettings->{'lines-numbered'}  = 1;});
 
 DeclareOption('linesnumberedhidden',
                             sub{$globalSettings->{'lines-labeled'}   = 0;});
@@ -179,7 +184,7 @@ DeclareOption('commentsnumbered',
                             sub{$globalSettings->{'comments-numbered'} = 1;});    
 
 DeclareOption('inoutnumbered',
-                            sub{$globalSettings->{'inout-numbered'}    = 1;});
+                            sub{$globalSettings->{'input-numbered'}    = 1;});
 
 DeclareOption('resetcount', 
                             sub{$globalSettings->{'auto-reset-lines'}  = 1;});
@@ -204,15 +209,15 @@ DefConstructor('\BlankLine',  '\algoEndLine');
 #                           Setting Global Styles
 #------------------------------------------------------------------------------
 
-DefConstructor('\SetAlgoCaptionSeparator',
+DefMacro('\SetAlgoCaptionSeparator',
 sub
 {
     my ($gullet,$arg)= @_;
     $globalSettings->{'caption-separator'} = $arg;    
 });
 
-DefConstructor('\NoCaptionOfAlgo',      sub{$globalSettings->{'print-caption'} = 0;});
-DefConstructor('\RestoreCaptionOfAlgo', sub{$globalSettings->{'print-caption'} = 1;});
+DefMacro('\NoCaptionOfAlgo',      sub{$globalSettings->{'print-caption'} = 0; return ();});
+DefMacro('\RestoreCaptionOfAlgo', sub{$globalSettings->{'print-caption'} = 1; return ();});
 
 
 
@@ -222,8 +227,8 @@ DefConstructor('\RestoreCaptionOfAlgo', sub{$globalSettings->{'print-caption'} =
 #                           Labeling and Numbering
 #------------------------------------------------------------------------------
 
-DefConstructor('\LinesNumbered',        sub{$globalSettings->{'lines-numbered'} = 1;});
-DefConstructor('\LinesNumberedHidden',  sub{$globalSettings->{'lines-labeled'}  = 0;});
+DefMacro('\LinesNumbered',        sub{$globalSettings->{'lines-numbered'} = 1; return ();});
+DefMacro('\LinesNumberedHidden',  sub{$globalSettings->{'lines-labeled'}  = 0; return ();});
 
 # macros for labeling lines 
 # in the latex version \nllabel, \lnl, and \label all kind of do different
@@ -248,7 +253,9 @@ for my $name (qw(nllabel lnl algoLabel))
         {
         	# FIXME: there are probably other tokens that are allowed in
         	# label names other than numbers, letters, and underscores
-			if($token->getCatcode != CC_LETTER)
+        	
+        	
+			if($token->getString eq '_')
 			{
 				push(@response, T_CS('\_'));
 			}
@@ -301,7 +308,7 @@ sub
 {
     # set the custom text
     my ($gullet, $arg) = @_;
-    $lineSettings->{'reftext'} = $arg;
+    $lineSettings->{'reftext'} = $arg->toString;
     
     # set the flag indicating that it is custom text
     $lineSettings->{'is-custom-text'}=1;
@@ -318,7 +325,7 @@ sub
     # set the custom text
     my ($gullet, $text, $label) = @_;
     my $labelArray     = $lineSettings->{'labels'};
-    $lineSettings->{'reftext'} = $text;
+    $lineSettings->{'reftext'} = $text->toString;
     push( @$labelArray, $label );
     
     # set the flag indicating that it is custom text
@@ -474,21 +481,98 @@ for my $style( qw(LongEnd ShortEnd NoEnd) )
 # ------------------------------------------------------------------------------
 #                       Utility macros
 # ------------------------------------------------------------------------------
-DefMacro('\algoSetInputLine',
+
+# informs the constructor that this is an input line, so don't number it unless
+# the settings indicate to
+DefConstructor('\algoSetInputLine',
 sub
 {
+    my ($document,$arg) = @_;
     $lineSettings->{'is-input'} = 1;
     
-    #return empty token liest
-    ();
+    #return empty token list
+    #();
 });
 
-DefMacro('\algoSetCommentLine',
+# informs the constructor that this is an input line, so don't number it unless
+# the settings indicate to
+DefConstructor('\algoSetCommentLine',
 sub
 {
     $lineSettings->{'is-comment'} = 1;
-    #return empty token liest
-    ();
+    #return empty token list
+    #();
+});
+
+# informs the constructor that this line should have a hidden style (the 
+# stylesheet will give it 0px height), this is a placeholder for the end tick
+# in the vlined style
+DefConstructor('\algoHideLine',
+sub
+{   
+    $lineSettings->{'is-hidden'} = 1;
+    #return empty token list
+    #();
+});
+
+DefConstructor('\algoConstructVline',
+sub
+{   
+    my $document = shift;
+    
+    $document->openElement('ltx:inline-block');
+    $document->setAttribute('class', 'algorithm2e-underbar');
+    $document->closeElement('ltx:inline-block');
+    #return empty token list
+    #();
+});
+
+
+
+# handles the various styles of 'end' that we may encounter
+DefMacro('\algoEndStatement{}',
+sub
+{
+    my($gullet, $arg) = @_;
+    
+    my @result;
+    
+    # if we don't output any text for endings, then we tell the
+    # constructor that this is a hidden line
+    if($algorithmSettings->{'lined-style'} eq 'vlined'
+       || $algorithmSettings->{'end-style'} eq 'noend' )
+    {
+        push(@result, T_CS('\algoHideLine'));   
+    }
+    
+    # if the algorithm style is vlined, then we need to output the
+    # little horizontal line in the rendered html
+    if( $algorithmSettings->{'lined-style'} eq 'vlined' )
+    {
+        push(@result, T_CS('\algoConstructVLine'));
+    }
+    
+    # if the line style is not vlined, then maybe we output an end marker
+    else
+    {
+        # if the end style is long, then we keep the tokens that have been
+        # digested
+        if( $algorithmSettings->{'end-style'} eq 'longend' )
+        {
+            push(@result, $arg );
+        }
+        
+        # if the end style is short, then we replace these tokens with the 
+        # digestion of '\KwSty{end}'
+        elsif( $algorithmSettings->{'end-style'} eq 'shortend' )
+        {
+            push(@result, Tokenize('\KwSty{end}'));
+        }
+            
+        # otherwise we the end style his noend and we don't output anything
+    }
+    
+    return @result;
 });
 
 # ------------------------------------------------------------------------------
@@ -499,7 +583,7 @@ sub
 {
     my ($gullet,$macro,$text) = @_;    
     my $command     = sprintf('\%s{}',$macro);
-    my $expansion   = sprintf('\algoSetInputLine \KwSty{%s} #1 \algoEndLine', $text);
+    my $expansion   = sprintf('\algoSetInputLine \KwSty{%s}: #1 \algoEndLine', $text);
     
     DefMacro($command,$expansion);
     
@@ -557,9 +641,9 @@ sub
     # normal if statement with end statement and contents are a block
     DefMacro(
         sprintf('\%s{}{}', $ifMacro),
-        sprintf('\KwSty{%s} #1 \KwSty{%s} '
+        sprintf('\KwSty{%s} \ArgSty{ #1 } \KwSty{%s} '
                 .'\algoBeginBlock #2 \algoEndBlock '
-                .'\KwSty{%s} \algoEndLine', 
+                .'\algoEndStatement{ \KwSty{%s} } \algoEndLine', 
                 $ifString,
                 $thenString,
                 $endString
@@ -570,7 +654,7 @@ sub
     # appended
     DefMacro(
         sprintf('\u%s{}{}', $ifMacro),
-        sprintf('\KwSty{%s} #1 \KwSty{%s} '
+        sprintf('\KwSty{%s} \ArgSty{ #1 } \KwSty{%s} '
                 .'\algoBeginBlock #2 \algoEndBlock ',
                 $ifString,
                 $thenString
@@ -580,7 +664,7 @@ sub
     # single line if statment, then block is on the same line
     DefMacro(
         sprintf('\l%s{}{}', $ifMacro),
-        sprintf('\KwSty{%s} #1 \KwSty{%s} #2',
+        sprintf('\KwSty{%s} \ArgSty{ #1 } \KwSty{%s} #2',
                 $ifString,
                 $thenString
                 )
@@ -589,9 +673,9 @@ sub
     # same as if except uses 'elseif', used for continuation of uIf or lIf
     DefMacro(
         sprintf('\%s{}{}', $elseIfMacro),
-        sprintf('\KwSty{%s} #1 \KwSty{%s} '
+        sprintf('\KwSty{%s} \ArgSty{ #1 } \KwSty{%s} '
                 .'\algoBeginBlock #2 \algoEndBlock '
-                .'\KwSty{%s} \algoEndLine', 
+                .'\algoEndStatement{ \KwSty{%s} } \algoEndLine', 
                 $elseifString,
                 $thenString,
                 $endString
@@ -601,7 +685,7 @@ sub
     # unfinished elseif
     DefMacro(
         sprintf('\u%s{}{}', $elseIfMacro),
-        sprintf('\KwSty{%s} #1 \KwSty{%s} '
+        sprintf('\KwSty{%s} \ArgSty{ #1 } \KwSty{%s} '
                 .'\algoBeginBlock #2 \algoEndBlock ',
                 $elseifString,
                 $thenString
@@ -611,7 +695,7 @@ sub
     # single line elseif
     DefMacro(
         sprintf('\l%s{}{}', $elseIfMacro),
-        sprintf('\KwSty{%s} #1 \KwSty{%s} #2',
+        sprintf('\KwSty{%s} \ArgSty{ #1 } \KwSty{%s} #2',
                 $elseifString,
                 $thenString
                 )
@@ -623,7 +707,7 @@ sub
         sprintf('\%s{}', $elseMacro),
         sprintf('\KwSty{%s}  '
                 .'\algoBeginBlock #1 \algoEndBlock '
-                .'\KwSty{%s} \algoEndLine', 
+                .'\algoEndStatement{ \KwSty{%s} } \algoEndLine', 
                 $elseString,
                 $endString
                 )
@@ -668,9 +752,9 @@ sub
     # switch statement
     DefMacro(
         sprintf('\%s{}{}', $switchMacro),  
-        sprintf('\KwSty{%s} #1 \KwSty{%s} '
+        sprintf('\KwSty{%s} \ArgSty{ #1 } \KwSty{%s} '
                 .'\algoBeginBlock #2 \algoEndBlock '
-                .'\KwSty{%s}',
+                .'\algoEndStatement{ \KwSty{%s} } \algoEndLine',
                 $switchString,
                 $doString,
                 $endString
@@ -680,7 +764,7 @@ sub
     # case statement
     DefMacro(
         sprintf('\%s{}{}', $caseMacro),  
-        sprintf('\KwSty{%s} #1  '
+        sprintf('\KwSty{%s} \ArgSty{ #1 } '
                 .'\algoBeginBlock #2 \algoEndBlock ',
                 $caseString
                ) 
@@ -689,7 +773,7 @@ sub
     # unfinished case statement
     DefMacro(
         sprintf('\u%s{}{}', $caseMacro),  
-        sprintf('\KwSty{%s} #1  '
+        sprintf('\KwSty{%s} \ArgSty{ #1 }  '
                 .'\algoBeginBlock #2 \algoEndBlock ',
                 $caseString
                ) 
@@ -698,7 +782,7 @@ sub
     # singe line case statement
     DefMacro(
         sprintf('\l%s{}{}', $caseMacro),  
-        sprintf('\KwSty{%s} #1  #2',
+        sprintf('\KwSty{%s} \ArgSty{ #1 }  #2',
                 $caseString
                ) 
         );
@@ -707,7 +791,7 @@ sub
     DefMacro(
         sprintf('\%s{}', $otherMacro),  
         sprintf('\KwSty{%s}   '
-                .'\algoBeginBlock #2 \algoEndBlock ',
+                .'\algoBeginBlock #1 \algoEndBlock ',
                 $otherwiseString
                ) 
         );
@@ -715,7 +799,7 @@ sub
     # singe line otherwise
     DefMacro(
         sprintf('\l%s{}', $otherMacro),  
-        sprintf('\KwSty{%s} #2',
+        sprintf('\KwSty{%s} #1',
                 $otherwiseString
                ) 
         );    
@@ -734,9 +818,9 @@ sub
     # usual forloop
     DefMacro(
         sprintf('\%s{}{}', $forMacro),  
-        sprintf('\KwSty{%s} #1 \KwSty{%s} '
+        sprintf('\KwSty{%s} \ArgSty{ #1 } \KwSty{%s} '
                 .'\algoBeginBlock #2 \algoEndBlock '
-                .'\KwSty{%s}',
+                .'\algoEndStatement{ \KwSty{%s} } \algoEndLine',
                 $forString,
                 $doString,
                 $endString
@@ -746,7 +830,7 @@ sub
     # single line
     DefMacro(
         sprintf('\l%s{}{}', $forMacro),  
-        sprintf('\KwSty{%s} #1 \KwSty{%s} #2 ',
+        sprintf('\KwSty{%s} \ArgSty{ #1 } \KwSty{%s} #2 ',
                 $forString,
                 $doString
                ) 
@@ -767,7 +851,7 @@ sub
         sprintf('\%s{}{}', $repeatMacro),  
         sprintf('\KwSty{%s} '
                 .'\algoBeginBlock #2 \algoEndBlock '
-                .'\KwSty{%s} #1 ',
+                .'\KwSty{%s} \ArgSty{ #1 } ',
                 $repeatString,
                 $untilString
                ) 
@@ -776,7 +860,7 @@ sub
     # single line
     DefMacro(
         sprintf('\l%s{}{}', $repeatMacro),  
-        sprintf('\KwSty{%s} #2 \KwSty{%s} #1 ',
+        sprintf('\KwSty{%s} #2 \KwSty{%s} \ArgSty{ #1 } ',
                 $repeatString,
                 $untilString
                ) 
@@ -1075,9 +1159,7 @@ sub algoEndBlock
 sub algoBeginLine
 {
     my $document = shift;
-    
-    # we open a ltx:p element, and cache a reference to it. 
-    
+
     # this is the container for the line, it is a div in html
     $document->openElement("ltx:inline-block");
     $document->addAttribute("class"=>"algorithm2e-line");
@@ -1113,90 +1195,105 @@ sub algoEndLine
 {
 	my $document = shift;
 	my %ref;
-	
-	# we may have to assign the line a number if
-	#     1. the latex code explicitly sets this line to use numbering
-	#     2. the policy for this algorithm is to do line numbering and the
-	#        latex code has not explicitly turned of line numbering for this
-	#        line
-	my $shouldNumber = 
-	( 
-    	$lineSettings->{'should-number'}
-	       || (    $algorithmSettings->{'lines-labeled'} 
-                    && ! $lineSettings->{'is_input'}
-                    && ! $lineSettings->{'is_comment'} )
-           || (    $algorithmSettings->{'inout-numbered'}
-                    &&   $lineSettings->{'is_input'} )
-           || (    $algorithmSettings->{'comments-numbered'}
-                    &&   $lineSettings->{'is_comment'} )
-    );
-	
-	if( $shouldNumber )
+
+    # if this is a hidden line then we dont need to do much introspection
+    if($lineSettings->{'is-hidden'})
     {
-        %ref = RefStepCounter('algoLine');
+        # create and write out the xml:id of this element
+        %ref = RefStepID('algoLine');
+        $currentLineNode->setAttribute("xml:id",ToString($ref{'id'}));  
+        
+        # then close the currently opened elements
+        $document->closeElement("ltx:p");
+        $document->closeElement("ltx:inline-block");
     }
+    
     else
     {
-        %ref = RefStepID('algoLine');
-    }
 	
-	# assign the latexml attributes that we need
-    $currentLineNode->setAttribute("refnum",ToString($ref{'refnum'}));
-    $currentLineNode->setAttribute("xml:id",ToString($ref{'id'}));
-
-    # assign any labels that the user has created for this line
-    my $labelsRef = $lineSettings->{'labels'};
-    my @labels;
-    
-    foreach my $label(@$labelsRef)
-    {
-        push(@labels, sprintf("%s", $label));
-    }
-    
-    my $labelString = join(' ',@labels);
-    if( length($labelString) > 0 )
-    {
-        $currentLineNode->setAttribute("label", join(' ', @labels));
-    }
-    
-    
-    # then we close the opened ltx:p element and it's containing 
-    # inline-block element
-    $document->closeElement("ltx:p");
-    $document->closeElement("ltx:inline-block");
-    
-    my $shouldLabel = 
-    (
-        $lineSettings->{'should-print-number'}
-        || $algorithmSettings->{'lines-labeled'}
-    ) && $shouldNumber;     
-           
-    if( $shouldLabel )
-    {
-        # now, in the event that the line label needs to be output, we fill it
-        # here, so start by grabbing a pointer to the current node
-        my $returnMeToTheThrone = $document->getNode;
-        
-        # make the label node the active node
-        $document->setNode($currentLineLabelNode);
-        
-        if($lineSettings->{'is-custom-text'})
+    	# we may have to assign the line a number if
+    	#     1. the latex code explicitly sets this line to use numbering
+    	#     2. the policy for this algorithm is to do line numbering and the
+    	#        latex code has not explicitly turned of line numbering for this
+    	#        line
+    	my $shouldNumber = 
+    	( 
+        	$lineSettings->{'should-number'}
+    	       || (    $algorithmSettings->{'lines-numbered'} 
+                        && ! $lineSettings->{'is-input'}
+                        && ! $lineSettings->{'is-comment'} )
+               || (    $algorithmSettings->{'input-numbered'}
+                        &&   $lineSettings->{'is-input'} )
+               || (    $algorithmSettings->{'comments-numbered'}
+                        &&   $lineSettings->{'is-comment'} )
+        );
+    	
+    	if( $shouldNumber )
         {
-            # need to write out the text here
+            %ref = RefStepCounter('algoLine');
+            $currentLineNode->setAttribute("refnum",ToString($ref{'refnum'}));
         }
         else
         {
-            # Send the line number through the digestive track
-            $document->absorb(
-                 Digest(Tokenize( sprintf('\NlSty{ %d }',$ref{'refnum'}) )) );
-            
-            
-            # format and then write out the text here
+            %ref = RefStepID('algoLine');
+        }
+    
+        $currentLineNode->setAttribute("xml:id",ToString($ref{'id'}));	
+    	
+        # assign any labels that the user has created for this line
+        my $labelsRef = $lineSettings->{'labels'};
+        my @labels;
+        
+        foreach my $label(@$labelsRef)
+        {
+            push(@labels, sprintf("%s", $label));
+        }
+        
+        my $labelString = join(' ',@labels);
+        if( length($labelString) > 0 )
+        {
+            $currentLineNode->setAttribute('labels', join(' ', @labels));
         }
         
         
-        # restore the old current node
-        $document->setNode($returnMeToTheThrone);
+        # then we close the opened ltx:p element and it's containing 
+        # inline-block element
+        $document->closeElement("ltx:p");
+        $document->closeElement("ltx:inline-block");
+        
+        my $shouldLabel = 
+        (
+            $lineSettings->{'should-print-number'}
+            || $algorithmSettings->{'lines-labeled'}
+        ) && $shouldNumber;     
+               
+        if( $shouldLabel )
+        {
+            # now, in the event that the line label needs to be output, we fill 
+            # it here, so start by grabbing a pointer to the current node
+            my $returnMeToTheThrone = $document->getNode;
+            
+            # make the label node the active node
+            $document->setNode($currentLineLabelNode);
+            
+            if($lineSettings->{'is-custom-text'})
+            {
+                # Send the line number through the digestive track
+                $document->absorb(Digest(Tokenize( 
+                    sprintf('\NlSty{ %d }',$lineSettings->{'reftext'}) )) );
+            }
+            else
+            {
+                # Send the line number through the digestive track
+                $document->absorb(Digest(Tokenize( 
+                    sprintf('\NlSty{ %d }',$ref{'refnum'}) )) );
+            }
+            
+            
+            # restore the old current node
+            $document->setNode($returnMeToTheThrone);
+        }
+    
     }
     
 }

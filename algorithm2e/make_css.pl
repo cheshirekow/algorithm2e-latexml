@@ -178,6 +178,7 @@ $closeComment
   padding:       0px;
   padding-right: ${lineNoPad}px;
   margin:        0px;
+  font-size:     smaller;
 }
 
 p.algorithm2e-line-text
