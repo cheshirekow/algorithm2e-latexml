@@ -83,7 +83,6 @@ for $debug (0,1)
 div.algorithm2e-container
 {
     text-align: center;
-    float:      clear;
 }
     
 div.algorithm2e
@@ -242,7 +241,6 @@ $closeComment
   max-width:     60%;
   min-width:     ${minWidth}px;
   padding:       1px;
-  whitespace:    normal;
 }
 
 div.algorithm2e-caption-ruled

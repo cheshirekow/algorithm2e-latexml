@@ -2,7 +2,6 @@
 div.algorithm2e-container
 {
     text-align: center;
-    float:      clear;
 }
     
 div.algorithm2e
@@ -161,7 +160,6 @@ div.algorithm2e-caption
   max-width:     60%;
   min-width:     600px;
   padding:       1px;
-  whitespace:    normal;
 }
 
 div.algorithm2e-caption-ruled

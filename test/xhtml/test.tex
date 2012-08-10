@@ -19,25 +19,7 @@
 
 This is the source for the algorithm taken from the algorithm2e documentation.
 
-\lstset{language=tex,caption={Algorithm Source}}
-\begin{lstlisting}[frame=single]
-\begin{algorithm}[H]
-    %\SetAlgoLined
-    \KwData{this text}
-    \KwResult{how to write algorithm with \LaTeX2e }
-    initialization\;
-    \While{not at end of this document}{
-        read current\;
-        \eIf{understand}{
-            go to next section\;
-            current section becomes this one\;
-        }{
-        go back to the beginning of current section\;
-        } 
-    }
-    \caption{How to write algorithms}
-\end{algorithm}
-\end{lstlisting}
+\lstinputlisting[language=Tex,caption={Algorithm Source}]{algos/algorithm2e_howto_read}
  
 \section{Rendered By PdfLatex}
 
@@ -45,7 +27,7 @@ This version was created with pdflatex, and then rasterized with inkscape.
  
 \begin{center}
 \begin{figure}[h]
-    \includegraphics[scale=1.0]{test.png}
+    \includegraphics[scale=1.0]{images/algorithm2e_howto_read}
     \caption{Rendered with pdflatex}
 \end{figure}
 \end{center}
@@ -54,22 +36,7 @@ This version was created with pdflatex, and then rasterized with inkscape.
 
 This version was created with latexml and my algorithm2e binding.
 
-\begin{algorithm}[H]
-    \SetAlgoLined
-    \KwData{this text}
-    \KwResult{how to write algorithm with \LaTeX2e }
-    initialization\;
-    \While{not at end of this document}{
-        read current\;
-        \eIf{understand}{
-            go to next section\;
-            current section becomes this one\;
-        }{
-            go back to the beginning of current section\;
-        }
-    }
-    \caption{How to write algorithms}
-\end{algorithm}
+\input{algos/algorithm2e_howto_read}
 
 \section{A real algorithm}
 
