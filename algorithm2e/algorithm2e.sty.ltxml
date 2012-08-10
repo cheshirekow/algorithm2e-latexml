@@ -230,9 +230,42 @@ DefConstructor('\LinesNumberedHidden',  sub{$globalSettings->{'lines-labeled'}  
 # things, however, since we postpone generating a line number until the
 # line is digested, and each of these macros only makes sense if the line
 # is numbered, we can make them all do the same things
-for my $macroName (qw(\nllabel{} \lnl{} \algoLabel{}))
+for my $name (qw(nllabel lnl algoLabel))
 {
+	my $macroName 		= sprintf('\%s{}',$name);
+	my $constructorName = sprintf('\latexml%s',$name);
+    my $constructorDef  = sprintf('\latexml%s{}',$name);
+    
     DefMacro($macroName, 
+    sub
+    {
+        # add the new label to the list of labels for this line
+        my ($gullet, $arg) = @_;
+        
+        my @response = (T_CS($constructorName), T_BEGIN);
+        
+        while( my $token = $arg->readToken )
+        {
+        	# FIXME: there are probably other tokens that are allowed in
+        	# label names other than numbers, letters, and underscores
+			if($token->getCatcode != CC_LETTER)
+			{
+				push(@response, T_CS('\_'));
+			}
+			else
+			{
+				push(@response, $token);
+			}
+        }
+        
+        push(@response, T_END);
+        
+        #return empty list of tokens
+        return @response;
+    });
+    
+    
+    DefConstructor($constructorDef, 
     sub
     {
         # add the new label to the list of labels for this line
@@ -244,26 +277,26 @@ for my $macroName (qw(\nllabel{} \lnl{} \algoLabel{}))
         $lineSettings->{'should-number'} = 1;
         
         #return empty list of tokens
-        ()
+        #()
     });
 }
 
 
 # indicates that the current line should be numbered. In LaTeX, this must come
 # first in the line, but we don't actually care for latexml
-DefMacro('\nl', 
+DefConstructor('\nl', 
 sub
 {
     $lineSettings->{'should-number'} = 1;
     
     #return empty list of tokens
-    ()
+    #()
 });
 
 # set the text for the line "number" output, instead of outputting the actual
 # line number, will also be the text output when we use \ref{} if the 
 # line is labeled
-DefMacro('\nlset{}',
+DefConstructor('\nlset{}',
 sub
 {
     # set the custom text
@@ -274,12 +307,12 @@ sub
     $lineSettings->{'is-custom-text'}=1;
     
     #return empty list of tokens
-    ()
+    #()
 });
 
 # set the text for the line "number" output and a label for the line at the
 # same time
-DefMacro('\nlset{}{}',
+DefConstructor('\nlset{}{}',
 sub
 {
     # set the custom text
@@ -292,23 +325,23 @@ sub
     $lineSettings->{'is-custom-text'}=1;
     
     #return empty list of tokens
-    ()
+    #()
 });
 
 # indicates that theline number (or text) should be displayed, even if 
 # the linesnumbered hidden is activated
-DefMacro('\ShowLn',
+DefConstructor('\ShowLn',
 sub
 {
     $lineSettings->{'should-print-number'}=1;
     
     #return empty list of tokens
-    ()
+    #()
 });
 
 # indicates that theline number (or text) should be displayed, and adds a label
 # at the same time
-DefMacro('\ShowLn{}',
+DefConstructor('\ShowLn{}',
 sub
 {
     # set the custom text
