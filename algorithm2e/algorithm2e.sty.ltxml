@@ -55,6 +55,11 @@ our $globalSettings =
     'lined-style'       => 'noline',    # lined, vlined, noline
     'boxed-style'       => 'plain',     # boxed, boxruled, ruled, algoruled, tworuled
     'end-style'         => 'shortend',  # longend, shortend, noend
+    'is-captioned'      => 0,           # set to true when the caption
+                                        # constructor is called, this enables
+                                        # the label constructor to deal with
+                                        # line labels and algorithm labels 
+                                        # separately
 };
 
 our $algorithmSettings = $globalSettings;
@@ -277,11 +282,24 @@ for my $name (qw(nllabel lnl algoLabel))
     {
         # add the new label to the list of labels for this line
         my ($gullet, $arg) = @_;
-        my $labelArray     = $lineSettings->{'labels'};
-        push( @$labelArray, CleanLabel($arg) );
         
-        # ensure that this line will get a number
-        $lineSettings->{'should-number'} = 1;
+        # if this is a label after the caption, then we put it on the algorithm
+        # not the line
+        if( $algorithmSettings->{'is-captioned'} )
+        {
+            # FIXME: should allow more than one label per algorithm
+            $currentAlgorithmNode->setAttribute('labels',CleanLabel($arg));
+        }
+        
+        else
+        {
+            my $labelArray     = $lineSettings->{'labels'};
+            push( @$labelArray, CleanLabel($arg) );
+            
+            # ensure that this line will get a number
+            $lineSettings->{'should-number'} = 1;
+        }        
+        
         
         #return empty list of tokens
         #()
@@ -1028,6 +1046,8 @@ DefConstructor('\beginAlgoCaption',sub{
 DefConstructor('\endAlgoCaption',sub{
 	my $document = shift;
 	$document->setNode($restoreNode);
+	
+	$algorithmSettings->{'is-captioned'} = 1;
 });
 
 # the \algoSingleLineNumberOff control indicates that this line should not
