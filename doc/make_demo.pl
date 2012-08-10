@@ -15,6 +15,8 @@ chdir dirname(abs_path($0))
 
 $debugMargin    = 1;    # how much margin to add in debug mode
 
+$debugSize      = 10;   # how big to make zero sized elements in debug mode
+
 $borderWidth    = 1;    # how wide are the border and lines
 
 # how wide are the rule which are drawn in the "ruled" algorithm2e style
@@ -68,6 +70,7 @@ for $debug (0,1)
         if($debug)
         {
             $offsets[$depth]+= 3*($borderWidth+$debugMargin)
+                               + $debugSize;
         }
     }
     
@@ -166,6 +169,21 @@ $closeComment
   height:   0px;
 }
 
+span.algorithm2e-lineno-anchor
+{
+  display:        inline-block;
+  vertical-align: bottom;
+  position:       relative;
+  width:    0px;
+  height:   0px;
+$openComment
+  border:   ${borderWidth}px solid #0e9600;
+  background-color: #0e9600;
+  width:    ${debugSize}x;
+  height:   ${debugSize}px;
+$closeComment
+}
+
 p.algorithm2e-lineno
 {
 $openComment
@@ -174,6 +192,23 @@ $closeComment
   text-align:    right;
   position:      absolute;
   top:           0px;
+  padding:       0px;
+  padding-right: ${lineNoPad}px;
+  margin:        0px;
+  font-size:     smaller;
+}
+
+span.algorithm2e-lineno
+{
+$openComment
+  border:           ${borderWidth}px solid #f5b131;
+  background-color: #f5b131;
+$closeComment
+  font-size:     smaller;
+  display:       inline-block;
+  text-align:    right;
+  position:      absolute;
+  bottom:        0px;
   padding:       0px;
   padding-right: ${lineNoPad}px;
   margin:        0px;
@@ -228,6 +263,11 @@ for($depth=0; $depth < $maxDepth; $depth++)
         "p.algorithm2e-lineno-%d{ right: %4dpx; }\n", 
         $depth,
         $offsets[$depth]);
+        
+    $document .= sprintf(
+        "span.algorithm2e-lineno-%d{ right: %4dpx; }\n", 
+        $depth,
+        $offsets[$depth]);
 }
 
 $document .= <<"HERE";
@@ -246,7 +286,9 @@ $document .= <<"HERE";
             <p class="algorithm2e-lineno algorithm2e-lineno-0">1</p>
           </div>
 
-          <p class="algorithm2e-line-text">blah</p>
+          <p class="algorithm2e-line-text">
+          blah
+          </p>
         </div>
 
         <div class="algorithm2e-line">
@@ -289,10 +331,11 @@ $document .= <<"HERE";
           <div class="algorithm2e-block-x">
             <div class="algorithm2e-line">
               <div class="algorithm2e-lineno-pos">
-                <p class="algorithm2e-lineno algorithm2e-lineno-2">6</p>
-              </div>
-
-              <p class="algorithm2e-line-text">This is one really
+                  <p class="algorithm2e-lineno algorithm2e-lineno-2">6</p>
+                </div>
+              
+              <p class="algorithm2e-line-text">
+              This is one really
               long line see how subsequent parts of it (i.e.
               wrapped parts) are slightly indented? I dont think
               the latex package will do that for you, but this
@@ -488,6 +531,141 @@ $document .= <<"HERE";
         </div>
       </div>
     </div>
+  </div>
+  
+  <div style="height: 50px"></div>
+  
+  <div class="algorithm2e algorithm2e-boxed">
+    <div class="algorithm2e-right">
+      <div class="algorithm2e-block-0">
+        <div class="algorithm2e-line">
+          <p class="algorithm2e-line-text">
+          <span class="algorithm2e-lineno-anchor">
+              <span class="algorithm2e-lineno algorithm2e-lineno-0">1</span>
+          </span>
+          blah
+          </p>
+        </div>
+
+        <div class="algorithm2e-line">
+          <p class="algorithm2e-line-text">
+          <span class="algorithm2e-lineno-anchor">
+              <span class="algorithm2e-lineno algorithm2e-lineno-0">2</span>
+          </span>
+          blah</p>
+        </div>
+
+        <div class="algorithm2e-line">
+          <p class="algorithm2e-line-text">
+          <span class="algorithm2e-lineno-anchor">
+              <span class="algorithm2e-lineno algorithm2e-lineno-0">3</span>
+          </span>
+          <span class=
+          "algorithm2e-kw">while</span> some condition <span class=
+          "algorithm2e-kw">do</span></p>
+        </div>
+
+        <div class="algorithm2e-block-x">
+          <div class="algorithm2e-line">
+            <p class="algorithm2e-line-text">
+            <span class="algorithm2e-lineno-anchor">
+              <span class="algorithm2e-lineno algorithm2e-lineno-1">4</span>
+            </span>
+            blah
+            </p>
+          </div>
+
+          <div class="algorithm2e-line">
+            <p class="algorithm2e-line-text">
+            <span class="algorithm2e-lineno-anchor">
+              <span class="algorithm2e-lineno algorithm2e-lineno-1">5</span>
+            </span>
+            <span class=
+            "algorithm2e-kw">if</span> condition <span class=
+            "algorithm2e-kw">then</span></p>
+          </div>
+
+          <div class="algorithm2e-block-x">
+            <div class="algorithm2e-line">
+              <p class="algorithm2e-line-text">
+                <span class="algorithm2e-lineno-anchor">
+                  <span class="algorithm2e-lineno algorithm2e-lineno-2">6</span>
+                </span>
+              This is one really
+              long line see how subsequent parts of it (i.e.
+              wrapped parts) are slightly indented? I dont think
+              the latex package will do that for you, but this
+              binding can. Also, note that the line number for this
+              line is top-aligned. Nifty huh?</p>
+            </div>
+
+            <div class="algorithm2e-line">
+              <p class="algorithm2e-line-text">
+              <span class="algorithm2e-lineno-anchor">
+                  <span class="algorithm2e-lineno algorithm2e-lineno-2">7</span>
+                </span>
+              blah</p>
+            </div>
+          </div>
+
+          <div class="algorithm2e-line">
+            <p class="algorithm2e-line-text">
+            <span class="algorithm2e-lineno-anchor">
+                  <span class="algorithm2e-lineno algorithm2e-lineno-1">200</span>
+                </span>
+            <span class=
+            "algorithm2e-kw">else</span></p>
+          </div>
+
+          <div class="algorithm2e-block-x">
+            <div class="algorithm2e-line">
+              <p class="algorithm2e-line-text">
+              <span class="algorithm2e-lineno-anchor">
+                  <span class="algorithm2e-lineno algorithm2e-lineno-2">201</span>
+                </span>
+                blah</p>
+            </div>
+
+            <div class="algorithm2e-line">
+              <p class="algorithm2e-line-text">
+              <span class="algorithm2e-lineno-anchor">
+                  <span class="algorithm2e-lineno algorithm2e-lineno-2">202</span>
+                </span>
+                blah</p>
+            </div>
+
+            <div class="algorithm2e-underbar"></div>
+          </div>
+          
+          <div class="algorithm2e-line">
+            <p class="algorithm2e-line-text">
+                <span class="algorithm2e-lineno-anchor">
+                  <span class="algorithm2e-lineno algorithm2e-lineno-1">203</span>
+                </span>
+                <span class="algorithm2e-kw">end</span>
+            </p>
+          </div>
+
+          <div class="algorithm2e-underbar"></div>
+        </div>
+        
+        <div class="algorithm2e-line">
+          <p class="algorithm2e-line-text">
+            <span class="algorithm2e-lineno-anchor">
+                  <span class="algorithm2e-lineno algorithm2e-lineno-0">204</span>
+                </span>
+              <span class="algorithm2e-kw">end</span>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="algorithm2e-caption">
+    <span class="algorithm2e-label">Algorithm 1:</span>
+    <span class="algorithm2e-label-text">
+    This demonstration is the same as the first but uses an alternate method
+    of anchoring the line labels that hopefully will keep them bottom-aligned
+    with the baseline of the first text line in the paragraph.</span>
   </div>
   
   </body>

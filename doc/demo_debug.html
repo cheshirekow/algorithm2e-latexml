@@ -91,6 +91,21 @@ div.algorithm2e-lineno-pos
   height:   0px;
 }
 
+span.algorithm2e-lineno-anchor
+{
+  display:        inline-block;
+  vertical-align: bottom;
+  position:       relative;
+  width:    0px;
+  height:   0px;
+
+  border:   1px solid #0e9600;
+  background-color: #0e9600;
+  width:    10x;
+  height:   10px;
+
+}
+
 p.algorithm2e-lineno
 {
 
@@ -99,6 +114,23 @@ p.algorithm2e-lineno
   text-align:    right;
   position:      absolute;
   top:           0px;
+  padding:       0px;
+  padding-right: 5px;
+  margin:        0px;
+  font-size:     smaller;
+}
+
+span.algorithm2e-lineno
+{
+
+  border:           1px solid #f5b131;
+  background-color: #f5b131;
+
+  font-size:     smaller;
+  display:       inline-block;
+  text-align:    right;
+  position:      absolute;
+  bottom:        0px;
   padding:       0px;
   padding-right: 5px;
   margin:        0px;
@@ -144,16 +176,26 @@ span.algorithm2e-kw
   font-weight: bold;
 }
                 
-p.algorithm2e-lineno-0{ right:    6px; }
-p.algorithm2e-lineno-1{ right:   17px; }
-p.algorithm2e-lineno-2{ right:   28px; }
-p.algorithm2e-lineno-3{ right:   39px; }
-p.algorithm2e-lineno-4{ right:   50px; }
-p.algorithm2e-lineno-5{ right:   61px; }
-p.algorithm2e-lineno-6{ right:   72px; }
-p.algorithm2e-lineno-7{ right:   83px; }
-p.algorithm2e-lineno-8{ right:   94px; }
-p.algorithm2e-lineno-9{ right:  105px; }
+p.algorithm2e-lineno-0{ right:   16px; }
+span.algorithm2e-lineno-0{ right:   16px; }
+p.algorithm2e-lineno-1{ right:   27px; }
+span.algorithm2e-lineno-1{ right:   27px; }
+p.algorithm2e-lineno-2{ right:   38px; }
+span.algorithm2e-lineno-2{ right:   38px; }
+p.algorithm2e-lineno-3{ right:   49px; }
+span.algorithm2e-lineno-3{ right:   49px; }
+p.algorithm2e-lineno-4{ right:   60px; }
+span.algorithm2e-lineno-4{ right:   60px; }
+p.algorithm2e-lineno-5{ right:   71px; }
+span.algorithm2e-lineno-5{ right:   71px; }
+p.algorithm2e-lineno-6{ right:   82px; }
+span.algorithm2e-lineno-6{ right:   82px; }
+p.algorithm2e-lineno-7{ right:   93px; }
+span.algorithm2e-lineno-7{ right:   93px; }
+p.algorithm2e-lineno-8{ right:  104px; }
+span.algorithm2e-lineno-8{ right:  104px; }
+p.algorithm2e-lineno-9{ right:  115px; }
+span.algorithm2e-lineno-9{ right:  115px; }
                 
       </style>
     </head>
@@ -169,7 +211,9 @@ p.algorithm2e-lineno-9{ right:  105px; }
             <p class="algorithm2e-lineno algorithm2e-lineno-0">1</p>
           </div>
 
-          <p class="algorithm2e-line-text">blah</p>
+          <p class="algorithm2e-line-text">
+          blah
+          </p>
         </div>
 
         <div class="algorithm2e-line">
@@ -212,10 +256,11 @@ p.algorithm2e-lineno-9{ right:  105px; }
           <div class="algorithm2e-block-x">
             <div class="algorithm2e-line">
               <div class="algorithm2e-lineno-pos">
-                <p class="algorithm2e-lineno algorithm2e-lineno-2">6</p>
-              </div>
-
-              <p class="algorithm2e-line-text">This is one really
+                  <p class="algorithm2e-lineno algorithm2e-lineno-2">6</p>
+                </div>
+              
+              <p class="algorithm2e-line-text">
+              This is one really
               long line see how subsequent parts of it (i.e.
               wrapped parts) are slightly indented? I dont think
               the latex package will do that for you, but this
@@ -411,6 +456,141 @@ p.algorithm2e-lineno-9{ right:  105px; }
         </div>
       </div>
     </div>
+  </div>
+  
+  <div style="height: 50px"></div>
+  
+  <div class="algorithm2e algorithm2e-boxed">
+    <div class="algorithm2e-right">
+      <div class="algorithm2e-block-0">
+        <div class="algorithm2e-line">
+          <p class="algorithm2e-line-text">
+          <span class="algorithm2e-lineno-anchor">
+              <span class="algorithm2e-lineno algorithm2e-lineno-0">1</span>
+          </span>
+          blah
+          </p>
+        </div>
+
+        <div class="algorithm2e-line">
+          <p class="algorithm2e-line-text">
+          <span class="algorithm2e-lineno-anchor">
+              <span class="algorithm2e-lineno algorithm2e-lineno-0">2</span>
+          </span>
+          blah</p>
+        </div>
+
+        <div class="algorithm2e-line">
+          <p class="algorithm2e-line-text">
+          <span class="algorithm2e-lineno-anchor">
+              <span class="algorithm2e-lineno algorithm2e-lineno-0">3</span>
+          </span>
+          <span class=
+          "algorithm2e-kw">while</span> some condition <span class=
+          "algorithm2e-kw">do</span></p>
+        </div>
+
+        <div class="algorithm2e-block-x">
+          <div class="algorithm2e-line">
+            <p class="algorithm2e-line-text">
+            <span class="algorithm2e-lineno-anchor">
+              <span class="algorithm2e-lineno algorithm2e-lineno-1">4</span>
+            </span>
+            blah
+            </p>
+          </div>
+
+          <div class="algorithm2e-line">
+            <p class="algorithm2e-line-text">
+            <span class="algorithm2e-lineno-anchor">
+              <span class="algorithm2e-lineno algorithm2e-lineno-1">5</span>
+            </span>
+            <span class=
+            "algorithm2e-kw">if</span> condition <span class=
+            "algorithm2e-kw">then</span></p>
+          </div>
+
+          <div class="algorithm2e-block-x">
+            <div class="algorithm2e-line">
+              <p class="algorithm2e-line-text">
+                <span class="algorithm2e-lineno-anchor">
+                  <span class="algorithm2e-lineno algorithm2e-lineno-2">6</span>
+                </span>
+              This is one really
+              long line see how subsequent parts of it (i.e.
+              wrapped parts) are slightly indented? I dont think
+              the latex package will do that for you, but this
+              binding can. Also, note that the line number for this
+              line is top-aligned. Nifty huh?</p>
+            </div>
+
+            <div class="algorithm2e-line">
+              <p class="algorithm2e-line-text">
+              <span class="algorithm2e-lineno-anchor">
+                  <span class="algorithm2e-lineno algorithm2e-lineno-2">7</span>
+                </span>
+              blah</p>
+            </div>
+          </div>
+
+          <div class="algorithm2e-line">
+            <p class="algorithm2e-line-text">
+            <span class="algorithm2e-lineno-anchor">
+                  <span class="algorithm2e-lineno algorithm2e-lineno-1">200</span>
+                </span>
+            <span class=
+            "algorithm2e-kw">else</span></p>
+          </div>
+
+          <div class="algorithm2e-block-x">
+            <div class="algorithm2e-line">
+              <p class="algorithm2e-line-text">
+              <span class="algorithm2e-lineno-anchor">
+                  <span class="algorithm2e-lineno algorithm2e-lineno-2">201</span>
+                </span>
+                blah</p>
+            </div>
+
+            <div class="algorithm2e-line">
+              <p class="algorithm2e-line-text">
+              <span class="algorithm2e-lineno-anchor">
+                  <span class="algorithm2e-lineno algorithm2e-lineno-2">202</span>
+                </span>
+                blah</p>
+            </div>
+
+            <div class="algorithm2e-underbar"></div>
+          </div>
+          
+          <div class="algorithm2e-line">
+            <p class="algorithm2e-line-text">
+                <span class="algorithm2e-lineno-anchor">
+                  <span class="algorithm2e-lineno algorithm2e-lineno-1">203</span>
+                </span>
+                <span class="algorithm2e-kw">end</span>
+            </p>
+          </div>
+
+          <div class="algorithm2e-underbar"></div>
+        </div>
+        
+        <div class="algorithm2e-line">
+          <p class="algorithm2e-line-text">
+            <span class="algorithm2e-lineno-anchor">
+                  <span class="algorithm2e-lineno algorithm2e-lineno-0">204</span>
+                </span>
+              <span class="algorithm2e-kw">end</span>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="algorithm2e-caption">
+    <span class="algorithm2e-label">Algorithm 1:</span>
+    <span class="algorithm2e-label-text">
+    This demonstration is the same as the first but uses an alternate method
+    of anchoring the line labels that hopefully will keep them bottom-aligned
+    with the baseline of the first text line in the paragraph.</span>
   </div>
   
   </body>
