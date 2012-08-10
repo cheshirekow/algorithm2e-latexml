@@ -84,12 +84,29 @@ div.algorithm2e-line
 
 div.algorithm2e-lineno-pos
 {
-/*
-  border:   1px solid #0e9600;
-*/
   position: relative;
   width:    0px;
   height:   0px;
+/*
+  border:   1px solid #0e9600;
+  width:    10px;
+  height:   10px;
+*/
+}
+
+span.algorithm2e-lineno-anchor
+{
+  display:        inline-block;
+  vertical-align: bottom;
+  position:       relative;
+  width:    0px;
+  height:   0px;
+/*
+  border:   1px solid #0e9600;
+  background-color: #0e9600;
+  width:    10px;
+  height:   10px;
+*/
 }
 
 p.algorithm2e-lineno
@@ -104,6 +121,22 @@ p.algorithm2e-lineno
   padding-right: 5px;
   margin:        0px;
   font-size:     smaller;
+}
+
+span.algorithm2e-lineno
+{
+/*
+  border:           1px solid #f5b131;
+  background-color: #f5b131;
+*/
+  font-size:     smaller;
+  display:       inline-block;
+  text-align:    right;
+  position:      absolute;
+  bottom:        0px;
+  padding:       0px;
+  padding-right: 5px;
+  margin:        0px;
 }
 
 p.algorithm2e-line-text
@@ -147,13 +180,23 @@ span.algorithm2e-kw
 }
                 
 p.algorithm2e-lineno-0{ right:    0px; }
+span.algorithm2e-lineno-0{ right:    0px; }
 p.algorithm2e-lineno-1{ right:   11px; }
+span.algorithm2e-lineno-1{ right:   11px; }
 p.algorithm2e-lineno-2{ right:   22px; }
+span.algorithm2e-lineno-2{ right:   22px; }
 p.algorithm2e-lineno-3{ right:   33px; }
+span.algorithm2e-lineno-3{ right:   33px; }
 p.algorithm2e-lineno-4{ right:   44px; }
+span.algorithm2e-lineno-4{ right:   44px; }
 p.algorithm2e-lineno-5{ right:   55px; }
+span.algorithm2e-lineno-5{ right:   55px; }
 p.algorithm2e-lineno-6{ right:   66px; }
+span.algorithm2e-lineno-6{ right:   66px; }
 p.algorithm2e-lineno-7{ right:   77px; }
+span.algorithm2e-lineno-7{ right:   77px; }
 p.algorithm2e-lineno-8{ right:   88px; }
+span.algorithm2e-lineno-8{ right:   88px; }
 p.algorithm2e-lineno-9{ right:   99px; }
+span.algorithm2e-lineno-9{ right:   99px; }
 

@@ -268,6 +268,12 @@ for($depth=0; $depth < $maxDepth; $depth++)
         "p.algorithm2e-lineno-%d{ right: %4dpx; }\n", 
         $depth,
         $offsets[$depth]);
+        
+           
+    $document .= sprintf(
+        "span.algorithm2e-lineno-%d{ right: %4dpx; }\n", 
+        $depth,
+        $offsets[$depth]);
 }
 
 $document .= "\n";
