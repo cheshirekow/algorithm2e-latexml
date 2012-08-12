@@ -45,11 +45,12 @@ Here is the basic mapping that of pseudocode layout to latexml elements
 The layout is done using some ugly css hacks and several levels of nested 
 elements. Here is a diagram which should illustrate whats going on:
 
-![Layout Method](layout.png)
-![Layout Method](layout_explain.png)
+![Layout Method](images/layout.png)
+![Layout Method](images/layout_explain.png)
 
-There is a demo of this layout using CSS [here](demo.html) and with informative
-outlines [here](demo_debug.html)
+There is a demo of this layout using CSS [here](demo/index.html) and with 
+informative outlines [here](demo/debug.html). You can also see the output of
+a test file [here](test/test.xhtml).
 
 
 Implemented Features

@@ -36,5 +36,5 @@ print $outfile $footer;
 
 close($outfile);
 
-print `inkscape --export-png=layout.png layout.svg`;
-print `inkscape --export-png=layout_explain.png layout_explain.svg`;
+print `inkscape --export-png=images/layout.png images/layout.svg`;
+print `inkscape --export-png=images/layout_explain.png images/layout_explain.svg`;
