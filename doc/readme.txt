@@ -23,8 +23,8 @@ Notes
 
 *   There is a relevant thread on 
     [the mailing list][]
-*   This code is mostly a proof of concept and has been semi abandoned. I hope
-    to get around to it sooner or later. 
+*   This code is mostly a proof of concept and not all features are 
+    implemented. I hope to get around to it sooner or later. 
     
 [the mailing list]: http://lists.jacobs-university.de/pipermail/project-latexml/2011-July/000507.html
 
@@ -32,25 +32,62 @@ Notes
 How it works
 --------------------------
 
-Here is the basic mapping that of pseudocode layout to latexml elements
+Here is the basic mapping of pseudocode layout to latexml elements using the
+old line number label positioning (aligned to the top)
 
     pseudo code layout        latexml element        html   class
     ------------------        ---------------        ------ -------
     algorithm            =>   ltx:float         =>   div    algorithm2e
-    block                =>   ltx:inline-block  =>   span   algorithm2e-block
-    line                 =>   ltx:p             =>   p      algorithm2e-line
+    block                =>   ltx:inline-block  =>   div    algorithm2e-block-[0|x]
+    line                 =>   ltx:inline-block  =>   div    algorithm2e-line
+    line number          =>   ltx:inline-block  =>   div    algorithm2e-lineno-pos
+                              ltx:p             =>   div    algorithm2e-lineno, algorithm2e-lineno-[x]
+    line text            =>   ltx:p             =>   p      algorithm2e-line-text
+    caption              =>   ltx:caption       =>   div    algorithm2e-caption
+    
+Using the new positioning scheme, line number labels are bottom-aligned to the
+baseline of the first line of text in the psuedocode line. In other words
+if the pseudo code is too long for a single line and it wraps to more than
+one actual line, the line number remains bottom-aligned to the baseline of
+the text in the first actual line.
+
+    pseudo code layout        latexml element        html   class
+    ------------------        ---------------        ------ -------
+    algorithm            =>   ltx:float         =>   div    algorithm2e
+    block                =>   ltx:inline-block  =>   div    algorithm2e-block-[0|x]
+    line                 =>   ltx:inline-block  =>   div    algorithm2e-line
+    line text            =>   ltx:inline-block  =>   p      algorithm2e-line-text
+    line number          =>   ltx:inline-block  =>   span   algorithm2e-lineno-anchor
+                              ltx:inline-block  =>   span   algorithm2e-lineno, algorithm2e-lineno-[x]
     caption              =>   ltx:caption       =>   div    algorithm2e-caption
     
 
-The layout is done using some ugly css hacks and several levels of nested 
-elements. Here is a diagram which should illustrate whats going on:
+The layout is done using some ugly css hacks and a couple levels of nested 
+elements. Here is a diagram which should illustrate whats going on (at least 
+for the old alignment):
 
 ![Layout Method](images/layout.png)
 ![Layout Method](images/layout_explain.png)
 
 There is a demo of this layout using CSS [here](demo/index.html) and with 
 informative outlines [here](demo/debug.html). You can also see the output of
-a test file [here](test/test.xhtml).
+a test file [here](test/test.xhtml), or with the debug stylesheet 
+[here](test/test_debug.xhtml).
+
+The new alignment is illustrated in the last of the three algorithms in the
+demo. 
+
+
+CSS Stylesheet
+========================
+
+The css stylesheet for use of this package is algorithm2e.css and is generated
+by make_css.pl. Since line numbers are positioned absolutely using a distance
+which is calculated based on how wide the margins, padding, and border are
+for the block-divs the script will automatically calculate these sums and
+generate the css code. There are many options at the beginning of the file so
+feel free to play with them if you think the layout requires more/less 
+whitespace, etc. 
 
 
 Implemented Features
