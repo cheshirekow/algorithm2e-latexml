@@ -29,18 +29,46 @@
     exclude-result-prefixes = "ltx f func string">
 
 
+<!--  
+    The ltx:float element encapsulates the entire algorithm2e environment,
+    when we encounter it, we need to setup the container div, which manages
+    the alignment, and the shrink-wrapped div which can be styled to have
+    various outlines or rules 
+  -->
 <xsl:template match="ltx:float[contains(concat(' ',@class,' '), 'algorithm2e')]" xml:space="preserve">
   <div class="algorithm2e-container">
+  
+  <!-- create a div and copy the class attribute from the ltx:float -->
   <div><xsl:attribute name="class"><xsl:value-of select="./@class"/></xsl:attribute>
+  
+    <!-- 
+      if it's one of the ruled styles, then we put the caption here,
+      before the content of the algorithm
+    -->
     <xsl:if test="contains(concat(' ',@class,' '), 'algorithm2e-ruled') or contains(concat(' ',@class,' '), 'algorithm2e-tworuled')">
       <xsl:apply-templates select="ltx:caption"/>
     </xsl:if>
-    
+   
+    <!-- 
+      this div contains the contents of the algorithm, and has a margin on the
+      left where the line number labels can go
+    -->
     <div class="algorithm2e-right">
         <xsl:apply-templates select="ltx:inline-block|ltx:p"/>
     </div>
   </div>
+  
+  <!-- 
+    this div just ensures that the caption isn't floated next to the
+    algorithm, since the algorithm and the caption have inline-block
+    display style
+  -->
   <div class="algorithm2e-clear"></div>
+  
+  <!-- 
+    if this algorithm is the plain or boxed style, then the caption goes 
+    underneath it, here
+  -->
   <xsl:if test="contains(concat(' ',@class,' '), 'algorithm2e-plain') or contains(concat(' ',@class,' '), 'algorithm2e-boxed') ">
       <xsl:apply-templates select="ltx:caption"/>        
   </xsl:if>
@@ -48,19 +76,46 @@
 </xsl:template>
 
 
-<xsl:template match="ltx:inline-block[@class='algorithm2e-block-0']|ltx:inline-block[@class='algorithm2e-block-x']" xml:space="preserve">
+
+<!-- 
+  in the old method of line number label alignment, we map inline blocks to
+  divs, so here we apply these mappings, and just copy the class attribute of
+  the inline block to the div
+-->
+<xsl:template match="ltx:inline-block[@class='algorithm2e-block-0']|ltx:inline-block[@class='algorithm2e-block-x']|ltx:inline-block[contains(concat(' ',@class,' '),' algorithm2e-line ')]|ltx:inline-block[@class='algorithm2e-lineno-pos']" xml:space="preserve">
     <div><xsl:attribute name="class"><xsl:value-of select="./@class"/></xsl:attribute>
       <xsl:apply-templates select="ltx:inline-block|ltx:p"/>
     </div>
 </xsl:template>
 
-<xsl:template match="ltx:inline-block[@class='algorithm2e-block-0']|ltx:inline-block[@class='algorithm2e-block-x']|ltx:inline-block[@class='algorithm2e-line']|ltx:inline-block[@class='algorithm2e-lineno-pos']" xml:space="preserve">
-    <div><xsl:attribute name="class"><xsl:value-of select="./@class"/></xsl:attribute>
+<!-- 
+  in the new method of line number label alignment, we map inline blocks to
+  <p> or <span> depending on their class name
+-->
+<xsl:template match="ltx:inline-block[@class='algorithm2e-line-text']" xml:space="preserve">
+    <p><xsl:attribute name="class"><xsl:value-of select="./@class"/></xsl:attribute>
       <xsl:apply-templates select="ltx:inline-block|ltx:p"/>
-    </div>
+    </p>
 </xsl:template>
 
+<xsl:template match="ltx:inline-block[@class='algorithm2e-lineno-anchor']|ltx:inline-block[contains(concat(' ',@class,' '), ' algorithm2e-lineno ')]" xml:space="preserve">
+    <span><xsl:attribute name="class"><xsl:value-of select="./@class"/></xsl:attribute><xsl:apply-templates select="ltx:inline-block|ltx:p"/></span>
+</xsl:template>
 
+<!-- 
+  in the new method of line number label alignment, we have some <p> elements
+  which are sitting inside our inline-blocks... and we want those inline-blocks
+  to be the <p> so we need to get rid of these <p>'s
+-->
+<xsl:template match="ltx:inline-block[@class='algorithm2e-line-text']//ltx:p" xml:space="preserve">
+  <xsl:apply-templates />
+</xsl:template>
+
+<!-- 
+  We want to process the algorithm2e caption differently than the normal
+  captions, so we map the caption block to a div and then put the contants
+  inside it
+-->
 <xsl:template match="ltx:caption[@class='algorithm2e-caption']" xml:space="preserve">
   <div class="algorithm2e-caption">
     <xsl:apply-templates/>
@@ -68,28 +123,5 @@
 </xsl:template>
 
 
-<!-- 
-
-<xsl:template match="ltx:inline-block[@class='algorithm2e-block']" xml:space="preserve">
-    <div class="algorithm2e-block algorithm2e-block-{f:depth(.)}">
-      <xsl:apply-templates/>
-    </div>
-</xsl:template>
-
-
-<xsl:template match="ltx:inline-block[@class='algorithm2e-block']/ltx:p[@class='algorithm2e-line']" xml:space="preserve">
-  <div class="algorithm2e-line algorithm2e-{f:alternate(.)}">
-    <div class="algorithm2e-lineno algorithm2e-lineno-{f:depth(..)}"><xsl:value-of select="./@refnum"/></div> 
-    <xsl:call-template name="spacer.loop" xml:space="default">
-      <xsl:with-param name="i">1</xsl:with-param>
-      <xsl:with-param name="count"><xsl:value-of select="../@depth - 1"/></xsl:with-param>
-    </xsl:call-template>
-    <div class="algorithm2e-linecontent algorithm2e-line-{f:depth(..)}">     
-      <xsl:apply-templates/>
-    </div>
-  </div>
-  <div style="clear: both;"></div>
-</xsl:template>
- -->
 
 </xsl:stylesheet>

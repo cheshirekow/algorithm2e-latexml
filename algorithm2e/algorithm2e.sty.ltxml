@@ -31,6 +31,13 @@ use strict;
 use LaTeXML::Package;
 use Storable qw(dclone);
 
+
+# new alignment method for line number labels, change to 0 to use old alignment 
+# method which used a div in front of the paragraph, instead of new method 
+# which uses a span inside the paragraph
+our $useSpanAlignment   = 1;
+
+
 our $procString = "procedure";  
 our $algoString = "algorithm";  # this is the string used to start/end our
                                 # environment, it can be changed by the algo2e
@@ -1195,28 +1202,56 @@ sub algoEndBlock
 sub algoBeginLine
 {
     my $document = shift;
-
+    
     # this is the container for the line, it is a div in html
     $document->openElement("ltx:inline-block");
     $document->addAttribute("class"=>"algorithm2e-line");
     
-    # this is the placeholder for the label
-    $document->openElement("ltx:inline-block");
-    $document->addAttribute("class"=>"algorithm2e-lineno-pos");
     
-    # this is the actual label element, a ltx:p
-    $currentLineLabelNode =
-    $document->openElement("ltx:p");
-    $document->addAttribute("class"=>
-            sprintf("algorithm2e-lineno algorithm2e-lineno-%d",$algoDepth-1) );
-            
-    # we can close these last two nodes
-    $document->closeElement("ltx:p");
-    $document->closeElement("ltx:inline-block");
+
+    if(! $useSpanAlignment)
+    {
+        # this is the placeholder for the label
+        $document->openElement("ltx:inline-block");
+        $document->addAttribute("class"=>"algorithm2e-lineno-pos");
+        
+        # this is the actual label element, a ltx:p
+        $currentLineLabelNode =
+        $document->openElement("ltx:p");
+        $document->addAttribute("class"=>
+                sprintf("algorithm2e-lineno algorithm2e-lineno-%d",$algoDepth-1) );
+                
+        # we can close these last two nodes
+        $document->closeElement("ltx:p");
+        $document->closeElement("ltx:inline-block");        
+        
+        # and this is the actual contents of the line
+        $currentLineNode = 
+        $document->openElement("ltx:p");
+    }
+
     
-    # and this is the actual contents of the line
-    $currentLineNode = 
-    $document->openElement("ltx:p");
+    if( $useSpanAlignment )
+    {
+        # and this is the actual contents of the line
+        $currentLineNode = 
+        $document->openElement("ltx:inline-block");
+        
+        # this is the placeholder for the label
+        $document->openElement("ltx:inline-block");
+        $document->addAttribute("class"=>"algorithm2e-lineno-anchor");
+        
+        # this is the actual label element, a ltx:p
+        $currentLineLabelNode =
+        $document->openElement("ltx:inline-block");
+        $document->addAttribute("class"=>
+                sprintf("algorithm2e-lineno algorithm2e-lineno-%d",$algoDepth-1) );
+                
+        # we can close these last two nodes
+        $document->closeElement("ltx:inline-block");
+        $document->closeElement("ltx:inline-block");    
+    }
+    
     
     # assign a class name of algoirthm2e-line so that we can style it with
     # css
@@ -1239,9 +1274,17 @@ sub algoEndLine
         %ref = RefStepID('algoLine');
         $currentLineNode->setAttribute("xml:id",ToString($ref{'id'}));  
         
-        # then close the currently opened elements
-        $document->closeElement("ltx:p");
-        $document->closeElement("ltx:inline-block");
+        if($useSpanAlignment)
+        {
+            $document->closeElement("ltx:inline-block");
+            $document->closeElement("ltx:inline-block");
+        }
+        else
+        {
+            # then close the currently opened elements
+            $document->closeElement("ltx:p");
+            $document->closeElement("ltx:inline-block");
+        }
     }
     
     else
@@ -1294,8 +1337,17 @@ sub algoEndLine
         
         # then we close the opened ltx:p element and it's containing 
         # inline-block element
-        $document->closeElement("ltx:p");
-        $document->closeElement("ltx:inline-block");
+        if($useSpanAlignment)
+        {
+            $document->closeElement("ltx:inline-block");
+            $document->closeElement("ltx:inline-block");
+        }
+        else
+        {
+            # then close the currently opened elements
+            $document->closeElement("ltx:p");
+            $document->closeElement("ltx:inline-block");
+        }
         
         my $shouldLabel = 
         (
@@ -1340,8 +1392,19 @@ sub algoCancelLine
 {
     my $document = shift;
     $document->setNode($currentLineNode);
-    $document->maybeCloseElement("ltx:p");
-    $document->closeElement("ltx:inline-block");
+    
+    if($useSpanAlignment)
+    {
+        $document->closeElement("ltx:inline-block");
+        $document->maybeCloseElement("ltx:inline-block");
+    }
+    else
+    {
+        $document->maybeCloseElement("ltx:p");
+        $document->closeElement("ltx:inline-block");
+    }
+    
+    $currentLineNode->parentNode->setAttribute("class","algorithm2e-line algorithm2e-line-hidden");
 }
 
 

@@ -82,6 +82,11 @@ div.algorithm2e-line
   margin:     0px;
 }
 
+div.algorithm2e-line-hidden
+{
+  display: none;
+}
+
 div.algorithm2e-lineno-pos
 {
   position: relative;
