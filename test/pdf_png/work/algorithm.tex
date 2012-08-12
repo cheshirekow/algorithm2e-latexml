@@ -1,14 +1,22 @@
 \nonstopmode
-\documentclass[a0paper]{memoir}
+\documentclass{article}
 
 
 \usepackage{amsmath} 
 \usepackage{amssymb} 
+\usepackage{amsfonts}
+\usepackage{graphicx}
 \usepackage[lined,boxed,linesnumbered]{algorithm2e}
+\usepackage{listings}
+
+\newcommand{\NearNodes}{Near}
+\DeclareMathOperator{\Src}{Src}
+\DeclareMathOperator{\Dest}{Dest}
+\DeclareMathOperator{\Cl}{cl}
 
 \begin{document}
 \thispagestyle{empty}
-\begin{minipage}{3.5in}
-    \input{algos/algorithm2e_howto_read.tex}
+\begin{minipage}{4in}
+    \input{algos/rrtstar_extend.tex}
 \end{minipage}
 \end{document}

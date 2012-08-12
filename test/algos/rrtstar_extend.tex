@@ -1,0 +1,43 @@
+\begin{algorithm}[H]
+    $V' \leftarrow V$; $E' \leftarrow E$\;
+    $x_\mathrm{nearest} \leftarrow {\tt Nearest} (G, x)$\; \label{rrtstar:extend_nearest_start}
+    $\sigma \leftarrow {\tt Steer} (x_\mathrm{nearest}, x)$\; \label{rrtstar:extend_nearest_end}
+    \If {${\tt ObstacleFree} (\sigma)$}
+    {
+        $V' \leftarrow V' \cup \{x\}$\;
+        $x_\mathrm{min} \leftarrow x_\mathrm{nearest}$\;
+        $c_\mathrm{min} \leftarrow {\tt Cost}(x_\mathrm{nearest}) + c(\sigma)$\;    
+        \label{rrtstar:connect_to_close_node_start}
+        $X_\mathrm{near} \leftarrow {\tt \NearNodes} (G, x, \vert V \vert)$\; 
+        \For {all $x_\mathrm{near} \in X_\mathrm{near}$} 
+        {
+                $\sigma \leftarrow {\tt Steer} (x_\mathrm{near},x)$\;
+            \If {${\tt ObstacleFree} (\sigma)$ and
+                ${\tt Cost} (x_\mathrm{near}) + c(\sigma) < c_\mathrm{min}$}
+                {
+                    $x_\mathrm{min} \leftarrow x_\mathrm{near}$\;
+                    $c_\mathrm{min} \leftarrow {\tt Cost} (x_\mathrm{near}) + c(\sigma)$\;
+                }
+            
+        }
+
+        $E' \leftarrow E' \cup \{(x_\mathrm{min}, x)\}$\;
+        \label{rrtstar:connect_to_close_node_end}
+        \For {all $x_{near} \in X_\mathrm{near} \setminus \{x_\mathrm{min} \}$
+            \label{rrtstar:extend_back_to_tree_start}}
+        { 
+            $\sigma \leftarrow {\tt Steer}(x, x_\mathrm{near})$\;
+            \If{${\tt ObstacleFree}(\sigma)$ and ${\tt Cost}(x_\mathrm{near}) >
+                c_\mathrm{min}+ c (\sigma)$}
+            {
+                $x_\mathrm{parent} \leftarrow {\tt Parent} (x_\mathrm{near})$\;
+                $E' \leftarrow E' \setminus \{ (x_\mathrm{parent}, x_\mathrm{near})\}$;
+                $E' \leftarrow E' \cup \{(x_\mathrm{new}, x_\mathrm{near}) \}$\;  
+                \label{rrtstar:extend_back_to_tree_end}
+            } 
+        } 
+    }
+    \Return{$G' = (V', E')$}
+    \caption{${\tt Extend}_{RRT^*} ((V,E),x)$}
+    \label{algorithm:rrtstar_extend}
+\end{algorithm}

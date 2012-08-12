@@ -1,0 +1,10 @@
+\begin{algorithm}[H]
+  $V \leftarrow \{ x_\mathrm{init}\}$; $E \leftarrow \emptyset$; $i\leftarrow 0$\; \label{line:initial}
+  \While {$i < N$} { \label{line:iteration_start}
+    $x_\mathrm{rand} \leftarrow {\tt Sample}(i)$\;  \label{line:sample} 
+    $(V, E)\leftarrow {\tt Extend}((V,E),x_\mathrm{rand})$\;  \label{line:extend}
+    $i \leftarrow i + 1$\; \label{line:iteration_end}
+  }
+  \caption{RRT and RRT* Algorithms}
+  \label{algorithm:RRT_body}
+\end{algorithm}

@@ -1,0 +1,13 @@
+\begin{algorithm}[H]
+    $V' \leftarrow V$; $E' \leftarrow E$\;
+    $x_\mathrm{nearest} \leftarrow {\tt Nearest} (G,x)$\; 
+    $\sigma \leftarrow {\tt Steer} (x_\mathrm{nearest}, x)$\; 
+    \If{${\tt ObstacleFree}(\sigma)$}
+    {
+        $V' \leftarrow V' \cup \{x_\mathrm{new}\}$\; 
+        $E' \leftarrow E' \cup \{ (x_\mathrm{nearest}, x_\mathrm{new})\}$\; 
+    }
+    \Return{$G' = (V', E')$}
+    \caption{ ${\tt Extend}_{RRT} ((V,E), x)$ }
+    \label{algorithm:rrt_extend}
+\end{algorithm}

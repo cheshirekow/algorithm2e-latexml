@@ -10,17 +10,28 @@ chdir dirname(abs_path($0)) . "/work"
 # table of algorithm files and the width to use for them
 $entries = 
 [
-    ['3.5', 'algorithm2e_howto_read']
+    ['3.5', 'algorithm2e_howto_read'],
+    ['3',   'rrt_generic'],
+    ['3',   'rrt_extend'],
+    ['4',   'rrtstar_extend'],
 ];
 
 $format = <<'HERE';
 \nonstopmode
-\documentclass[a0paper]{memoir}
+\documentclass{article}
 
 
 \usepackage{amsmath} 
 \usepackage{amssymb} 
+\usepackage{amsfonts}
+\usepackage{graphicx}
 \usepackage[lined,boxed,linesnumbered]{algorithm2e}
+\usepackage{listings}
+
+\newcommand{\NearNodes}{Near}
+\DeclareMathOperator{\Src}{Src}
+\DeclareMathOperator{\Dest}{Dest}
+\DeclareMathOperator{\Cl}{cl}
 
 \begin{document}
 \thispagestyle{empty}
@@ -53,7 +64,7 @@ for $entry( @$entries )
     system ('pdfcrop algorithm.pdf algorithm-crop.pdf');
     die "Failed to run pdfcrop $!\n" if( ($? & 127) != 0 );    
     
-    system ( sprintf('convert algorithm-crop.pdf ../%s.png', $file) );
+    system ( sprintf('convert -density 100 algorithm-crop.pdf ../%s.png', $file) );
     die "Failed to run convert $!\n" if( ($? & 127) != 0 );
 }
 

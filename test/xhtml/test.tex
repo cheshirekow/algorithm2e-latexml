@@ -15,44 +15,38 @@
 
 \begin{document}
 
-\section{The source}
+\section{Example from algorithm2e Documentation}
 
-This is the source for the algorithm taken from the algorithm2e documentation.
+\subsection{Rendered By PdfLatex}
 
-\lstinputlisting[language=Tex,caption={Algorithm Source}]{algos/algorithm2e_howto_read}
+This version was created with pdflatex, and then rasterized with imagemagick.
  
-\section{Rendered By PdfLatex}
-
-This version was created with pdflatex, and then rasterized with inkscape.
- 
-\begin{center}
 \begin{figure}[h]
+    \centering
     \includegraphics[scale=1.0]{images/algorithm2e_howto_read}
     \caption{Rendered with pdflatex}
 \end{figure}
-\end{center}
 
-\section{Formatted by LaTeXML}
+\subsection{Formatted by LaTeXML}
 
 This version was created with latexml and my algorithm2e binding.
 
 \input{algos/algorithm2e_howto_read}
 
+
 \section{A real algorithm}
 
-Here is a real algorithm from an actual paper.
+Here are a few examples from ``the real world.''
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[scale=1.0]{images/rrt_generic}
+    \caption{Rendered with pdflatex}
+\end{figure}
 
 
-\begin{algorithm}[t] \small
-  $V \leftarrow \{ x_\mathrm{init}\}$; $E \leftarrow \emptyset$; $i\leftarrow 0$\; \label{line:initial}
-  \While {$i < N$} { \label{line:iteration_start}
-    $x_\mathrm{rand} \leftarrow {\tt Sample}(i)$\;  \label{line:sample} 
-    $(V, E)\leftarrow {\tt Extend}((V,E),x_\mathrm{rand})$\;  \label{line:extend}
-    $i \leftarrow i + 1$\; \label{line:iteration_end}
-  }
-  \caption{RRT and RRT* Algorithms}
-  \label{algorithm:RRT_body}
-\end{algorithm}
+\input{algos/rrt_generic}
+
 
 The RRT and the RRT$^*$ algorithms differ in the way that they handle the extension procedure in line \ref{line:extend}.
 %
@@ -60,19 +54,14 @@ The extension sub-routine of the RRT algorithm is shown in Algorithm~\ref{algori
 %
 The procedure finds the configuration $x_\mathrm{nearest} \in V$ that is closest to the sampled configuration, and checks whether the straight path connecting $x_\mathrm{nearest}$ and the sampled configuration is collision free. If so, the sampled configuration is added to the tree as a vertex along with an edge connecting it to $x_\mathrm{nearest}$.
 
-\begin{algorithm}[t] \small
-    $V' \leftarrow V$; $E' \leftarrow E$\;
-    $x_\mathrm{nearest} \leftarrow {\tt Nearest} (G,x)$\; 
-    $\sigma \leftarrow {\tt Steer} (x_\mathrm{nearest}, x)$\; 
-    \If{${\tt ObstacleFree}(\sigma)$}
-    {
-        $V' \leftarrow V' \cup \{x_\mathrm{new}\}$\; 
-        $E' \leftarrow E' \cup \{ (x_\mathrm{nearest}, x_\mathrm{new})\}$\; 
-    }
-    \Return{$G' = (V', E')$}
-    \caption{ ${\tt Extend}_{RRT} ((V,E), x)$ }
-    \label{algorithm:rrt_extend}
-\end{algorithm}
+\begin{figure}[h]
+    \centering
+    \includegraphics[scale=1.0]{images/rrt_extend}
+    \caption{Rendered with pdflatex}
+\end{figure}
+
+
+\input{algos/rrt_extend}
 
 The extension sub-routine of the RRT* (Algorithm \ref{algorithm:rrtstar_extend}) is slightly more involved. 
 %
@@ -84,50 +73,13 @@ Then, for each vertex in the set of near vertices, the checks whether the trajec
 %
 If so, the incoming edge to $x_\mathrm{near}$ is ``re-wired'' through $x_\mathrm{new}$.
 
-\begin{algorithm}[t] \small
-    $V' \leftarrow V$; $E' \leftarrow E$\;
-    $x_\mathrm{nearest} \leftarrow {\tt Nearest} (G, x)$\; \label{rrtstar:extend_nearest_start}
-    $\sigma \leftarrow {\tt Steer} (x_\mathrm{nearest}, x)$\; \label{rrtstar:extend_nearest_end}
-    \If {${\tt ObstacleFree} (\sigma)$}
-    {
-        $V' \leftarrow V' \cup \{x\}$\;
-        $x_\mathrm{min} \leftarrow x_\mathrm{nearest}$\;
-        $c_\mathrm{min} \leftarrow {\tt Cost}(x_\mathrm{nearest}) + c(\sigma)$\;    
-        \label{rrtstar:connect_to_close_node_start}
-        $X_\mathrm{near} \leftarrow {\tt \NearNodes} (G, x, \vert V \vert)$\; 
-        \For {all $x_\mathrm{near} \in X_\mathrm{near}$} 
-        {
-                $\sigma \leftarrow {\tt Steer} (x_\mathrm{near},x)$\;
-            \If {${\tt ObstacleFree} (\sigma)$ and
-                ${\tt Cost} (x_\mathrm{near}) + c(\sigma) < c_\mathrm{min}$}
-                {
-                    $x_\mathrm{min} \leftarrow x_\mathrm{near}$\;
-                    $c_\mathrm{min} \leftarrow {\tt Cost} (x_\mathrm{near}) + c(\sigma)$\;
-                }
-            
-        }
+\begin{figure}[h]
+    \centering
+    \includegraphics[scale=1.0]{images/rrtstar_extend}
+    \caption{Rendered with pdflatex}
+\end{figure}
 
-        $E' \leftarrow E' \cup \{(x_\mathrm{min}, x)\}$\;
-        \label{rrtstar:connect_to_close_node_end}
-        \For {all $x_{near} \in X_\mathrm{near} \setminus \{x_\mathrm{min} \}$
-            \label{rrtstar:extend_back_to_tree_start}}
-        { 
-            $\sigma \leftarrow {\tt Steer}(x, x_\mathrm{near})$\;
-            \If{${\tt ObstacleFree}(\sigma)$ and ${\tt Cost}(x_\mathrm{near}) >
-                c_\mathrm{min}+ c (\sigma)$}
-            {
-                $x_\mathrm{parent} \leftarrow {\tt Parent} (x_\mathrm{near})$\;
-                $E' \leftarrow E' \setminus \{ (x_\mathrm{parent}, x_\mathrm{near})\}$;
-                $E' \leftarrow E' \cup \{(x_\mathrm{new}, x_\mathrm{near}) \}$\;  
-                \label{rrtstar:extend_back_to_tree_end}
-            } 
-        } 
-    }
-    \Return{$G' = (V', E')$}
-    \caption{${\tt Extend}_{RRT^*} ((V,E),x)$}
-    \label{algorithm:rrtstar_extend}
-\end{algorithm}
-
+\input{algos/rrtstar_extend}
 
 
 

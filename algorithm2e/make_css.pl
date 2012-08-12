@@ -45,6 +45,7 @@ $lineNoPad      = 5;    # how much the line numbers should be padded from the
                         # text of the line
 $minWidth       = 600;  # minimum width of an algorithm block
 $captionMargin  = 10;   # space to leave under algorithm before caption
+$algoMargin     = 10;   # space to leave above and below the block
 
 
 # this is where we'll store the calculated offsets for positioning line numbers
@@ -82,7 +83,9 @@ for $debug (0,1)
     
 div.algorithm2e-container
 {
-    text-align: center;
+    text-align:    center;
+    margin-top:    ${algoMargin}px;
+    margin-bottom: ${algoMargin}px;
 }
     
 div.algorithm2e
