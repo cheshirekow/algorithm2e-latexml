@@ -234,23 +234,23 @@ Commands provided with the package
 
     command                     description                         implemented
     ------------                -------------------                 ------------
-    \AlgoLine                   counter used to number the lines            [ ]
+    \AlgoLine                   counter used to number the lines            [x]
     \LinesNumbered              makes lines of all following                [x]
                                 algorithms to be auto-numbered              
     \LinesNumberedHidden        makes lines auto-numbered, but              [x] 
                                 not shown
     \LinesNotNumbered           makes lines not auto-numbered               [x]
-    \nllabel{label}             labels lines when auto-numbering            [ ]
+    \nllabel{label}             labels lines when auto-numbering            [x]
                                 is active
     \nl                         numbers the line, must begin the line       [x]
-    \lnl{label}                 numbers and labels the line                 [ ]
+    \lnl{label}                 numbers and labels the line                 [x]
     \nlset{text}                works like \nl except that the
                                 additional argument is the text
                                 to put at the beginning of the line
-    \lnlset{text}{label}        works like \nlset but with text             [ ]
-    \ShowLn                     shows the number of the line when           [ ]
+    \lnlset{text}{label}        works like \nlset but with text             [x]
+    \ShowLn                     shows the number of the line when           [x]
                                 they are currently hidden
-    \ShowLn{label}              shows the number of the line when
+    \ShowLn{label}              shows the number of the line when           [x]
                                 hidden, and adds label
                             
     legend: 
@@ -262,7 +262,7 @@ Commands provided with the package
 
     command                     description                         implemented
     ------------                -------------------                 ------------
-    \SetNlSty{font}{txt}{txt}   defines how to print line numbers,          [ ]
+    \SetNlSty{font}{txt}{txt}   defines how to print line numbers,          [x]
                                 will print <font><txt>#<txt>, 
                                 default is {textbf}{}{}
     \SetNlSkip{length}          sets the value of the space                 [n]
@@ -283,26 +283,26 @@ Commands provided with the package
 
     command                     description                         implemented
     ------------                -------------------                 ------------
-    \SetAlFnt                   defines \AlFnt which is a                   [ ]
+    \SetAlFnt                   defines \AlFnt which is a                   [x]
                                 macro that is executed at the
                                 start of any algorithm to define
                                 the fonts
     \KwSty{txt}                 sets txt in kw type style                   [x]
-    \SetKwSty{}                 defines \KwStyl                             [ ]
+    \SetKwSty{}                 defines \KwStyl                             [x]
     \FuncSty{txt}               sets txt in function style                  [x]
-    \SetFuncSty{}               defines \FuncSty                            [ ]
+    \SetFuncSty{}               defines \FuncSty                            [x]
     \ArgSty                                                                 [x]
-    \SetArgSty                                                              [ ]
+    \SetArgSty                                                              [x]
     \DataSty                                                                [x]
-    \SetDataSty                                                             [ ]
+    \SetDataSty                                                             [x]
     \CommentSty                                                             [x]
-    \SetCommentSty                                                          [ ]
+    \SetCommentSty                                                          [x]
     \NlSty                                                                  [x]
-    \SetN1Sty                                                               [ ]
+    \SetN1Sty                                                               [x]
     \ProcNameSty                                                            [x]
-    \SetProcNameSty                                                         [ ]
+    \SetProcNameSty                                                         [x]
     \ProcArgSty                                                             [x]
-    \SetProcArgSty                                                          [ ]
+    \SetProcArgSty                                                          [x]
                             
     legend: 
     [ ] unimplemented
@@ -330,18 +330,18 @@ Commands provided with the package
     \SetNoline                  doesn't print vertical lines                [x]
     \SetAlgoLines               prints vertical lines between block         [x]
                                 keywords like start/end
-    \SetAlgoLongEnd                                                         [ ]
+    \SetAlgoLongEnd                                                         [x]
     \SetAlgoShortEnd                                                        [x]
     \SetAlgoNoEnd                                                           [x]
     \SetInd{}{}                                                             [n]
     \Setvlineskip                                                           [n]
     \SetAlgoSkip                                                            [n]
     \SetAlgoInsideSkip                                                      [n]
-    \algomargin                                                             [ ]
+    \algomargin                                                             [n]
     \IncMargin                                                              [ ]
     \DecMargin                                                              [ ]
     \SetAlgoNlRelativeSize                                                  [n]
-    \SetAlgoCaptionLayout                                                   [ ]
+    \SetAlgoCaptionLayout                                                   [n]
     
                             
     legend: 
@@ -371,16 +371,16 @@ Predefined Language Keywords
 
     command                     description                         implemented
     ------------                -------------------                 ------------
-    \KwIn                                                                   [ ]
-    \KwOut                                                                  [ ]
-    \KwData                                                                 [ ]
-    \KwResult                                                               [ ]
+    \KwIn                                                                   [x]
+    \KwOut                                                                  [x]
+    \KwData                                                                 [x]
+    \KwResult                                                               [x]
     
-    \KwTo                                                                   [ ]
-    \KwRet                                                                  [ ]
-    \Return                                                                 [ ]
-    \Begin{}                                                                [ ]
-    \Begin(){}                                                              [ ]
+    \KwTo                                                                   [x]
+    \KwRet                                                                  [x]
+    \Return                                                                 [x]
+    \Begin{}                                                                [x]
+    \Begin(){}                                                              [x]
     
     \tcc{}                                                                  [ ]
     \tcc*{}                                                                 [ ]
@@ -389,65 +389,65 @@ Predefined Language Keywords
     \tcp*{}                                                                 [ ]
     \tcp*[r|l|h|f]{}                                                        [ ]
     
-    \If{}{}                                                                 [ ]
-    \If(){}{}                                                               [ ]
-    \uIf{}{}                                                                [ ]
-    \uIf(){}{}                                                              [ ]
-    \lIf{}{}                                                                [ ]
-    \lIf(){}{}                                                              [ ]
-    \ElseIf{}                                                               [ ]
-    \ElseIf(){}                                                             [ ]
-    \uElseIf{}                                                              [ ]
-    \uElseIf(){}                                                            [ ]
-    \lElseIf{}                                                              [ ]
-    \lElseIf(){}                                                            [ ]
-    \Else{}                                                                 [ ]
-    \Else(){}                                                               [ ]
-    \uElse{}                                                                [ ]
-    \uElse(){}                                                              [ ]
-    \lElse{}                                                                [ ]
-    \lElse(){}                                                              [ ]
-    \eIf{}{}{}                                                              [ ]
-    \eIf(){}{}(){}                                                          [ ]
-    \eIf(){}{}{}                                                            [ ]
-    \eIf{}{}(){}                                                            [ ]
+    \If{}{}                                                                 [x]
+    \If(){}{}                                                               [x]
+    \uIf{}{}                                                                [x]
+    \uIf(){}{}                                                              [x]
+    \lIf{}{}                                                                [x]
+    \lIf(){}{}                                                              [x]
+    \ElseIf{}                                                               [x]
+    \ElseIf(){}                                                             [x]
+    \uElseIf{}                                                              [x]
+    \uElseIf(){}                                                            [x]
+    \lElseIf{}                                                              [x]
+    \lElseIf(){}                                                            [x]
+    \Else{}                                                                 [x]
+    \Else(){}                                                               [x]
+    \uElse{}                                                                [x]
+    \uElse(){}                                                              [x]
+    \lElse{}                                                                [x]
+    \lElse(){}                                                              [x]
+    \eIf{}{}{}                                                              [x]
+    \eIf(){}{}(){}                                                          [x]
+    \eIf(){}{}{}                                                            [x]
+    \eIf{}{}(){}                                                            [x]
                             
-    \Switch(){}{}                                                           [ ]
-    \Switch{}{}                                                             [ ]
-    \Case{}{}                                                               [ ]
-    \Case(){}{}                                                             [ ]
-    \uCase{}{}                                                              [ ]
-    \uCase(){}{}                                                            [ ]
-    \lCase{}{}                                                              [ ]
-    \lCase(){}{}                                                            [ ]
-    \Other{}                                                                [ ]
-    \Other(){}                                                              [ ]
-    \lOther{}                                                               [ ]
-    \lOther(){}                                                             [ ]
+    \Switch(){}{}                                                           [x]
+    \Switch{}{}                                                             [x]
+    \Case{}{}                                                               [x]
+    \Case(){}{}                                                             [x]
+    \uCase{}{}                                                              [x]
+    \uCase(){}{}                                                            [x]
+    \lCase{}{}                                                              [x]
+    \lCase(){}{}                                                            [x]
+    \Other{}                                                                [x]
+    \Other(){}                                                              [x]
+    \lOther{}                                                               [x]
+    \lOther(){}                                                             [x]
     
-    \For{}{}                                                                [ ]
-    \For(){}{}                                                              [ ]
-    \lFor{}{}                                                               [ ]
-    \lFor(){}{}                                                             [ ]
-    \While{}{}                                                              [ ]
-    \While(){}{}                                                            [ ]
-    \lWhile{}{}                                                             [ ]
-    \lWhile(){}{}                                                           [ ]
-    \ForEach{}{}                                                            [ ]
-    \ForEach(){}{}                                                          [ ]
-    \lForEach{}{}                                                           [ ]
-    \lForEach(){}{}                                                         [ ]
-    \ForAll{}{}                                                             [ ]
-    \ForAll(){}{}                                                           [ ]
-    \lForAll{}{}                                                            [ ]
-    \lForAll(){}{}                                                          [ ]
+    \For{}{}                                                                [x]
+    \For(){}{}                                                              [x]
+    \lFor{}{}                                                               [x]
+    \lFor(){}{}                                                             [x]
+    \While{}{}                                                              [x]
+    \While(){}{}                                                            [x]
+    \lWhile{}{}                                                             [x]
+    \lWhile(){}{}                                                           [x]
+    \ForEach{}{}                                                            [x]
+    \ForEach(){}{}                                                          [x]
+    \lForEach{}{}                                                           [x]
+    \lForEach(){}{}                                                         [x]
+    \ForAll{}{}                                                             [x]
+    \ForAll(){}{}                                                           [x]
+    \lForAll{}{}                                                            [x]
+    \lForAll(){}{}                                                          [x]
         
-    \Repeat{}{}                                                             [ ]
-    \Repeat(){}{}()                                                         [ ]
-    \Repeat(){}{}                                                           [ ]
-    \Repeat{}{}()                                                           [ ]
-    \lRepeat{}{}                                                            [ ]
-    \lRepeat(){}{}                                                          [ ]
+    \Repeat{}{}                                                             [x]
+    \Repeat(){}{}()                                                         [x]
+    \Repeat(){}{}                                                           [x]
+    \Repeat{}{}()                                                           [x]
+    \lRepeat{}{}                                                            [x]
+    \lRepeat(){}{}                                                          [x]
                             
     legend: 
     [ ] unimplemented
